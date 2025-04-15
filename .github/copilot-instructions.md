@@ -1,6 +1,4 @@
-# AI Rules for {{project-name}}
-
-{{project-description}}
+# AI Rules for 10x-cards
 
 ## Tech Stack
 
