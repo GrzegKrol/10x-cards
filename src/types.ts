@@ -36,12 +36,12 @@ export type FlashcardDTO = CamelizeKeys<FlashcardRow>;
 
 // List responses
 export interface GroupsListDTO {
-  groups: FlashcardGroupDTO[];
+  data: FlashcardGroupDTO[];
   pagination: PaginationDTO;
 }
 
 export interface FlashcardsListDTO {
-  flashcards: FlashcardDTO[];
+  data: FlashcardDTO[];
   pagination: PaginationDTO;
 }
 

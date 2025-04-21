@@ -32,7 +32,7 @@
   - **Success**: 200 OK with a JSON array of groups.
     ```json
     {
-      "groups": [{
+      "data": [{
         "id": "uuid",
         "userId": "uuid",
         "name": "string",
@@ -110,7 +110,7 @@
   - **Success**: 200 OK with an array of flashcard objects.
     ```json
     {
-      "flashcards": [{
+      "data": [{
         "id": "uuid",
         "front": "string",
         "back": "string",
