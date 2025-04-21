@@ -138,13 +138,14 @@
   {
     "front": "string (max 100 characters)",
     "back": "string (max 100 characters)",
-    "groupId": "UUID",
-    "source": "manual | ai"  // 'manual' for user-created, 'ai' for AI-generated
+    "groupId": "UUID"
   }
   ```
 - **Response**:
   - **Success**: 201 Created with created flashcard details.
   - **Error**: 400 Bad Request (validation errors like character limits), 401 Unauthorized.
+- **Business Logic**:
+  - This is an endpoint for manual card generation `source` should be set to "manual" automatically.
 
 #### GET /flashcards/{flashcardId}
 - **Method**: GET  
@@ -173,7 +174,8 @@
   ```json
   {
     "front": "string (max 100 characters)",
-    "back": "string (max 100 characters)"
+    "back": "string (max 100 characters)",
+    "isApproved": "boolean"
   }
   ```
 - **Response**:
