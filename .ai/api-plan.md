@@ -83,7 +83,7 @@
 - **Description**: Retrieve a list of flashcards for the authenticated user. Supports filtering by group.
 - **Query Parameters**:
   - `groupId` (optional): Filter flashcards by group.
-  - `source` (optional): `ai` or `manual`; Filter flashcards by source.
+  - `source` (optional): Filter by source ('manual' or 'ai').
   - `page` (optional): Page number.
   - `limit` (optional): Items per page.
   - `sort` (optional): Field to sort by (e.g., updated_date). `updated_date` is default.
@@ -101,7 +101,7 @@
     "front": "string (max 100 characters)",
     "back": "string (max 100 characters)",
     "group_id": "UUID",
-    "is_generated_by_ai": "boolean"  // Set to true when created by AI, false for manual creation
+    "source": "manual | ai"  // 'manual' for user-created, 'ai' for AI-generated
   }
   ```
 - **Response**:

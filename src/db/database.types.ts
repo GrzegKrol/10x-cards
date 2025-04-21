@@ -28,7 +28,7 @@ export interface Database {
           group_id: string;
           id: string;
           is_approved: boolean | null;
-          is_generated_by_ai: boolean | null;
+          source: "manual" | "ai";
           updated_date: string;
           user_id: string;
         };
@@ -39,7 +39,7 @@ export interface Database {
           group_id: string;
           id?: string;
           is_approved?: boolean | null;
-          is_generated_by_ai?: boolean | null;
+          source: "manual" | "ai";
           updated_date?: string;
           user_id: string;
         };
@@ -50,7 +50,7 @@ export interface Database {
           group_id?: string;
           id?: string;
           is_approved?: boolean | null;
-          is_generated_by_ai?: boolean | null;
+          source?: "manual" | "ai";
           updated_date?: string;
           user_id?: string;
         };

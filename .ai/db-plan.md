@@ -26,7 +26,7 @@ This table is managed by Supabase auth.
 - back: VARCHAR(100) NOT NULL   -- limited to 100 characters
 - creation_date: TIMESTAMPTZ NOT NULL DEFAULT now()
 - updated_date: TIMESTAMPTZ NOT NULL DEFAULT now()
-- is_generated_by_ai: BOOLEAN DEFAULT false
+- source: flashcard_source NOT NULL -- enum('manual', 'ai')
 - is_approved: BOOLEAN DEFAULT false
 - user_id: UUID NOT NULL REFERENCES users(id)
 - group_id: UUID NOT NULL REFERENCES flashcards_group(id)
