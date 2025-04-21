@@ -20,19 +20,37 @@
 
 ### Flashcards Groups
 
-#### GET /flashcards/groups
+#### GET /groups
 - **Method**: GET  
 - **Description**: Retrieve a list of flashcard groups for the authenticated user.
 - **Query Parameters**:
   - `page` (optional): Page number for pagination.
-  - `limit` (optional): Number of items per page.
+  - `limit` (optional): Number of items per page. `20` as default.
   - `sort` (optional): Field to sort by (e.g., updated_date). `updated_date` is default.
   - `order` (optional): `asc` or `desc`. `desc` is default.
 - **Response**:
   - **Success**: 200 OK with a JSON array of groups.
+    ```json
+    {
+      "groups": [{
+        "id": "uuid",
+        "userId": "uuid",
+        "name": "string",
+        "creationDate": "2024-01-20T12:00:00Z",
+        "updatedDate": "2024-01-20T12:00:00Z",
+        "lastUsedPrompt": "string|null",
+        "lastUsedCardsCount": 0
+      }],
+      "pagination": {
+        "page": 1,
+        "limit": 20,
+        "total": 100
+      }
+    }
+    ```
   - **Error**: 401 Unauthorized, 500 Internal Server Error.
 
-#### POST /flashcards/groups
+#### POST /groups
 - **Method**: POST  
 - **Description**: Create a new flashcards group.
 - **Request Payload**:
@@ -45,29 +63,29 @@
   - **Success**: 201 Created with the created group details.
   - **Error**: 400 Bad Request (e.g., missing name), 401 Unauthorized.
 
-#### GET /flashcards/groups/{groupId}
+#### GET /groups/{groupId}
 - **Method**: GET  
 - **Description**: Retrieve details of a specific flashcards group.
 - **Response**:
   - **Success**: 200 OK with group details.
   - **Error**: 401 Unauthorized, 404 Not Found.
 
-#### PUT /flashcards/groups/{groupId}
+#### PUT /groups/{groupId}
 - **Method**: PUT  
 - **Description**: Update the name or associated AI prompt details of an existing group.
 - **Request Payload**:
   ```json
   {
     "name": "string",
-    "last_used_prompt": "string",         // optional, for storing latest AI prompt text (max 1000 characters)
-    "last_used_cards_count": "number"       // optional, number of flashcards to generate (max 20)
+    "lastUsedPrompt": "string",         // optional, for storing latest AI prompt text (max 1000 characters)
+    "lastUsedCardsCount": "number"       // optional, number of flashcards to generate (max 20)
   }
   ```
 - **Response**:
   - **Success**: 200 OK with updated group details.
   - **Error**: 400 Bad Request (validation errors), 401 Unauthorized, 404 Not Found.
 
-#### DELETE /flashcards/groups/{groupId}
+#### DELETE /groups/{groupId}
 - **Method**: DELETE  
 - **Description**: Delete a specific flashcards group.
 - **Response**:
@@ -85,11 +103,31 @@
   - `groupId` (optional): Filter flashcards by group.
   - `source` (optional): Filter by source ('manual' or 'ai').
   - `page` (optional): Page number.
-  - `limit` (optional): Items per page.
+  - `limit` (optional): Items per page. `20` as default.
   - `sort` (optional): Field to sort by (e.g., updated_date). `updated_date` is default.
   - `order` (optional): `asc` or `desc`. `desc` is default.
 - **Response**:
   - **Success**: 200 OK with an array of flashcard objects.
+    ```json
+    {
+      "flashcards": [{
+        "id": "uuid",
+        "front": "string",
+        "back": "string",
+        "creationDate": "2024-01-20T12:00:00Z",
+        "updatedDate": "2024-01-20T12:00:00Z",
+        "source": "manual|ai",
+        "isApproved": true,
+        "userId": "uuid",
+        "groupId": "uuid"
+      }],
+      "pagination": {
+        "page": 1,
+        "limit": 20,
+        "total": 100
+      }
+    }
+    ```
   - **Error**: 401 Unauthorized, 500 Internal Server Error.
 
 #### POST /flashcards
@@ -100,7 +138,7 @@
   {
     "front": "string (max 100 characters)",
     "back": "string (max 100 characters)",
-    "group_id": "UUID",
+    "groupId": "UUID",
     "source": "manual | ai"  // 'manual' for user-created, 'ai' for AI-generated
   }
   ```
@@ -113,6 +151,19 @@
 - **Description**: Retrieve details of a specific flashcard.
 - **Response**:
   - **Success**: 200 OK with flashcard details.
+    ```json
+    {
+      "id": "uuid",
+      "front": "string",
+      "back": "string",
+      "creationDate": "2024-01-20T12:00:00Z",
+      "updatedDate": "2024-01-20T12:00:00Z",
+      "source": "manual|ai",
+      "isApproved": true,
+      "userId": "uuid",
+      "groupId": "uuid"
+    }
+    ```
   - **Error**: 401 Unauthorized, 404 Not Found.
 
 #### PUT /flashcards/{flashcardId}
@@ -146,18 +197,33 @@
 - **Request Payload**:
   ```json
   {
-    "group_id": "UUID",
+    "groupId": "UUID",
     "prompt": "string (max 1000 characters)",
-    "cards_count": "number (max 20)"
+    "cardsCount": "number (max 20)"
   }
   ```
 - **Response**:
   - **Success**: 200 OK with a list of generated flashcards (pending approval).
+    ```json
+    {
+      "flashcards": [{
+        "id": "uuid",
+        "front": "string",
+        "back": "string",
+        "creationDate": "2024-01-20T12:00:00Z",
+        "updatedDate": "2024-01-20T12:00:00Z",
+        "source": "ai",
+        "isApproved": false,
+        "userId": "uuid",
+        "groupId": "uuid"
+      }]
+    }
+    ```
   - **Error**: 400 Bad Request (if prompt length > 1000 or cards_count > 20), 401 Unauthorized.
 - **Business Logic**:
-  - Store the last used prompt and the number of flashcards in the corresponding flashcards group (`last_used_prompt` and `last_used_cards_count`).
+  - Store the last used prompt and the number of flashcards in the corresponding flashcards group (`lastUsedPrompt` and `lastUsedCardsCount`).
   - Validate input (length and count restrictions) and log detailed error information if validation fails.
-  - Store all generated flashcards in the DB setting `is_generated_by_ai = true` and `is_approved = false`.
+  - Store all generated flashcards in the DB setting `source = ai` and `is_approved = false`.
 
 ---
 
