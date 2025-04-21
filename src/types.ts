@@ -57,8 +57,8 @@ export interface CreateFlashcardGroupCommand {
 export interface UpdateFlashcardGroupCommand {
   // Name is expected and optional prompt related details
   name: string;
-  lastUsedPrompt?: string; // optional, max 1000 characters
-  lastUsedCardsCount?: number; // optional, max 20
+  lastUsedPrompt?: string; // optional, min 50, max 5000 characters
+  lastUsedCardsCount?: number; // optional, max 50
 }
 
 // Command for creating a new flashcard via POST /flashcards
@@ -78,6 +78,6 @@ export interface UpdateFlashcardCommand {
 // Command for generating flashcards using AI via POST /flashcards/ai
 export interface AICreateFlashcardCommand {
   groupId: string; // UUID of the associated flashcard group
-  prompt: string; // max 1000 characters
-  cardsCount: number; // maximum 20 flashcards to generate
+  prompt: string; // min 50, max 5000 characters
+  cardsCount: number; // maximum 50 flashcards to generate
 }

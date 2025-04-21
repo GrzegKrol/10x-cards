@@ -10,8 +10,8 @@ An endpoint for generating flashcards using artificial intelligence. Takes a pro
   ```typescript
   {
     groupId: string;    // Group UUID
-    prompt: string;     // max 1000 characters
-    cardsCount: number; // max 20 flashcards
+    prompt: string;     // min 50, max 5000 characters
+    cardsCount: number; // max 50 flashcards
   }
   ```
 
@@ -25,8 +25,8 @@ import { z } from 'zod';
 
 const AIFlashcardsRequestSchema = z.object({
   groupId: z.string().uuid(),
-  prompt: z.string().max(1000),
-  cardsCount: z.number().int().min(1).max(20)
+  prompt: z.string().min(50).max(5000),
+  cardsCount: z.number().int().min(1).max(50)
 });
 
 // Response DTO

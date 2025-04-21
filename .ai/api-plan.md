@@ -195,13 +195,13 @@
 
 #### POST /flashcards/ai
 - **Method**: POST  
-- **Description**: Generate multiple flashcards using an AI service. Accepts an AI prompt (max 1000 characters) and a number of flashcards (maximum 20) to generate.
+- **Description**: Generate multiple flashcards using an AI service. Accepts an AI prompt (min 50, max 5000 characters) and a number of flashcards (maximum 50) to generate.
 - **Request Payload**:
   ```json
   {
     "groupId": "UUID",
-    "prompt": "string (max 1000 characters)",
-    "cardsCount": "number (max 20)"
+    "prompt": "string (min 50, max 5000 characters)",
+    "cardsCount": "number (max 50)"
   }
   ```
 - **Response**:
@@ -221,7 +221,7 @@
       }]
     }
     ```
-  - **Error**: 400 Bad Request (if prompt length > 1000 or cards_count > 20), 401 Unauthorized.
+  - **Error**: 400 Bad Request (if prompt length < 50 or > 5000, or cards_count > 50), 401 Unauthorized.
 - **Business Logic**:
   - Store the last used prompt and the number of flashcards in the corresponding flashcards group (`lastUsedPrompt` and `lastUsedCardsCount`).
   - Validate input (length and count restrictions) and log detailed error information if validation fails.
