@@ -26,7 +26,8 @@
 - **Query Parameters**:
   - `page` (optional): Page number for pagination.
   - `limit` (optional): Number of items per page.
-  - `sort` (optional): Field to sort by (e.g., updated_date).
+  - `sort` (optional): Field to sort by (e.g., updated_date). `updated_date` is default.
+  - `order` (optional): `asc` or `desc`. `desc` is default.
 - **Response**:
   - **Success**: 200 OK with a JSON array of groups.
   - **Error**: 401 Unauthorized, 500 Internal Server Error.
@@ -82,9 +83,11 @@
 - **Description**: Retrieve a list of flashcards for the authenticated user. Supports filtering by group.
 - **Query Parameters**:
   - `groupId` (optional): Filter flashcards by group.
+  - `source` (optional): `ai` or `manual`; Filter flashcards by source.
   - `page` (optional): Page number.
   - `limit` (optional): Items per page.
-  - `sort` (optional): Field to sort by (e.g., updated_date).
+  - `sort` (optional): Field to sort by (e.g., updated_date). `updated_date` is default.
+  - `order` (optional): `asc` or `desc`. `desc` is default.
 - **Response**:
   - **Success**: 200 OK with an array of flashcard objects.
   - **Error**: 401 Unauthorized, 500 Internal Server Error.
