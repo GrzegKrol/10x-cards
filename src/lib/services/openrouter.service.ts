@@ -63,7 +63,8 @@ export class OpenRouterService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`${ERROR_MESSAGES.OPENROUTER_ERROR}: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`${ERROR_MESSAGES.OPENROUTER_ERROR} (${response.status}): ${errorText}`);
       }
 
       const rawJson = await response.json();
@@ -77,10 +78,20 @@ export class OpenRouterService {
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.name === "AbortError") {
+          console.error(ERROR_MESSAGES.OPENROUTER_ERROR, {
+            maxResponseTime: this.maxResponseTime,
+            error: error.message,
+          });
           throw new Error("OpenRouter API request timed out");
         }
+        console.error(ERROR_MESSAGES.OPENROUTER_ERROR, {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
         throw new Error(`${ERROR_MESSAGES.OPENROUTER_ERROR}: ${error.message}`);
       }
+      console.error("Unknown OpenRouter Error:", error);
       throw new Error(ERROR_MESSAGES.OPENROUTER_ERROR);
     }
   }
