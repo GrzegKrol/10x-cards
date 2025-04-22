@@ -2,7 +2,6 @@ import type { SupabaseClient } from "@/db/supabase.client";
 import type { AICreateFlashcardCommand, FlashcardDTO } from "@/types";
 import { OpenRouterService } from "./openrouter.service";
 import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
-import { log } from "node_modules/astro/dist/core/logger/core";
 
 export class AIFlashcardsService {
   constructor(
