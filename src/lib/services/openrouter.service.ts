@@ -1,4 +1,4 @@
-import type { FlashcardAI, OpenRouterResponse } from "@/types";
+import type { FlashcardAI } from "@/types";
 import { ERROR_MESSAGES } from "@/lib/constants";
 
 export class OpenRouterService {
@@ -21,22 +21,41 @@ export class OpenRouterService {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": import.meta.env.PUBLIC_APP_URL || "http://localhost:4321",
           "X-Title": "10x Cards Flashcard Generator",
         },
         body: JSON.stringify({
-          model: "openai/gpt-4.1-nano",
+          model: "google/gemma-3-27b-it:free",
           messages: [
             {
               role: "system",
-              content: `You are a flashcard generation assistant. Generate ${count} flashcards based on the given text. Output should be a valid JSON array with objects containing "front" and "back" properties. Each side should be concise and not exceed 100 characters.`,
+              content: `You are a flashcard generation assistant. Generate ${count} flashcards based on the given text. 
+              Each flashcard should have "front" and "back" properties, with text not exceeding 100 characters per side.
+              Format the response as a raw JSON object with a "flashcards" array containing the generated flashcards. Do not add '\`\`\`json' prefix or new line characters'`,
             },
             {
               role: "user",
               content: prompt,
             },
           ],
-          response_format: { type: "json_object" },
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "flashcards",
+              type: "array",
+              strict: true,
+              items: {
+                type: "object",
+                properties: {
+                  front: { type: "string", maxLength: 100 },
+                  back: { type: "string", maxLength: 100 },
+                },
+                required: ["front", "back"],
+                additionalProperties: false,
+              },
+              required: ["flashcards"],
+              additionalProperties: false,
+            },
+          },
         }),
         signal: controller.signal,
       });
@@ -47,8 +66,14 @@ export class OpenRouterService {
         throw new Error(`${ERROR_MESSAGES.OPENROUTER_ERROR}: ${response.statusText}`);
       }
 
-      const data = (await response.json()) as OpenRouterResponse;
-      return data.choices[0].message.content;
+      const rawJson = await response.json();
+      console.debug("Raw API response:", rawJson);
+      console.debug("Structured API message:", rawJson.choices[0].message);
+
+      const flashcards = JSON.parse(rawJson.choices[0].message.content).flashcards as FlashcardAI[];
+      console.debug("Extracted flashcards:", flashcards);
+
+      return flashcards;
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.name === "AbortError") {

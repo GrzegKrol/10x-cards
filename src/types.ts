@@ -74,14 +74,6 @@ export interface AICreateFlashcardCommand {
 }
 
 // OpenRouter API types
-export interface OpenRouterResponse {
-  choices: {
-    message: {
-      content: FlashcardAI[];
-    };
-  }[];
-}
-
 export interface FlashcardAI {
   front: string;
   back: string;
