@@ -1,22 +1,12 @@
 import type { Database } from "./db/database.types";
 
-// ===================== Utility Types =====================
-
-type CamelCase<S extends string> = S extends `${infer P1}_${infer P2}${infer P3}`
-  ? `${Lowercase<P1>}${Uppercase<P2>}${CamelCase<P3>}`
-  : Lowercase<S>;
-
-type CamelizeKeys<T> = {
-  [K in keyof T as CamelCase<K & string>]: T[K] extends Record<string, unknown> ? CamelizeKeys<T[K]> : T[K];
-};
-
 // ===================== DTOs =====================
 
 // User Data Transfer Object (retrieved via Supabase auth)
 export interface UserDTO {
   id: string;
   email: string;
-  createdAt: string;
+  created_at: string;
 }
 
 // Pagination info used in list endpoints
@@ -30,9 +20,9 @@ export interface PaginationDTO {
 type FlashcardGroupRow = Database["public"]["Tables"]["flashcards_group"]["Row"];
 type FlashcardRow = Database["public"]["Tables"]["flashcard"]["Row"];
 
-// Transformed DTOs with camelCase properties
-export type FlashcardGroupDTO = CamelizeKeys<FlashcardGroupRow>;
-export type FlashcardDTO = CamelizeKeys<FlashcardRow>;
+// DTOs match database row types
+export type FlashcardGroupDTO = FlashcardGroupRow;
+export type FlashcardDTO = FlashcardRow;
 
 // List responses
 export interface GroupsListDTO {
@@ -57,30 +47,30 @@ export interface CreateFlashcardGroupCommand {
 export interface UpdateFlashcardGroupCommand {
   // Name is expected and optional prompt related details
   name: string;
-  lastUsedPrompt?: string; // optional, min 50, max 5000 characters
-  lastUsedCardsCount?: number; // optional, max 50
+  last_used_prompt?: string; // optional, min 50, max 5000 characters
+  last_used_cards_count?: number; // optional, max 50
 }
 
 // Command for creating a new flashcard via POST /flashcards
 export interface CreateFlashcardCommand {
   front: string; // max 100 characters
   back: string; // max 100 characters
-  groupId: string; // UUID of the associated flashcard group
+  group_id: string; // UUID of the associated flashcard group
 }
 
 // Command for updating an existing flashcard via PUT /flashcards/{flashcardId}
 export interface UpdateFlashcardCommand {
   front: string; // max 100 characters
   back: string; // max 100 characters
-  isApproved: boolean; // whether the flashcard is approved
+  is_approved: boolean; // whether the flashcard is approved
 }
 
 // Command for generating flashcards using AI via POST /flashcards/ai
 export interface AICreateFlashcardCommand {
-  groupId: string; // UUID of the associated flashcard group
+  group_id: string; // UUID of the associated flashcard group
   prompt: string; // min 50, max 5000 characters
-  cardsCount: number; // maximum 50 flashcards to generate
-  userId: string; // user ID for development
+  cards_count: number; // maximum 50 flashcards to generate
+  user_id: string; // user ID for development
 }
 
 // OpenRouter API types

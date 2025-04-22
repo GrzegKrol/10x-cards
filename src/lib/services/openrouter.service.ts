@@ -25,7 +25,7 @@ export class OpenRouterService {
           "X-Title": "10x Cards Flashcard Generator",
         },
         body: JSON.stringify({
-          model: "openai/gpt-4",
+          model: "openai/gpt-4.1-nano",
           messages: [
             {
               role: "system",

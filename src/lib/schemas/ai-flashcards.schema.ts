@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 export const AIFlashcardsRequestSchema = z.object({
-  groupId: z.string().uuid("Group ID must be a valid UUID"),
+  group_id: z.string().uuid("Group ID must be a valid UUID"),
   prompt: z
     .string()
     .min(50, "Prompt must be at least 50 characters long")
     .max(5000, "Prompt must not exceed 5000 characters"),
-  cardsCount: z
+  cards_count: z
     .number()
     .int("Number of cards must be an integer")
     .min(1, "Must generate at least 1 card")

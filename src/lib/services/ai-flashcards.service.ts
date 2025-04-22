@@ -14,8 +14,8 @@ export class AIFlashcardsService {
     const { data: group, error: groupError } = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .select("id")
-      .eq("id", command.groupId)
-      .eq("user_id", command.userId)
+      .eq("id", command.group_id)
+      .eq("user_id", command.user_id)
       .single();
 
     if (groupError || !group) {
@@ -23,7 +23,7 @@ export class AIFlashcardsService {
     }
 
     // Generate flashcards using AI
-    const generatedCards = await this.openRouter.generateFlashcards(command.prompt, command.cardsCount);
+    const generatedCards = await this.openRouter.generateFlashcards(command.prompt, command.cards_count);
 
     // Save generated flashcards to database
     const now = new Date().toISOString();
@@ -33,9 +33,9 @@ export class AIFlashcardsService {
         generatedCards.map((card) => ({
           front: card.front,
           back: card.back,
-          group_id: command.groupId,
-          user_id: command.userId,
-          source: "ai",
+          group_id: command.group_id,
+          user_id: command.user_id,
+          source: "ai" as const,
           is_approved: false,
           creation_date: now,
           updated_date: now,
@@ -56,28 +56,17 @@ export class AIFlashcardsService {
       .from(DB_TABLES.FLASHCARD_GROUP)
       .update({
         last_used_prompt: command.prompt,
-        last_used_cards_count: command.cardsCount,
+        last_used_cards_count: command.cards_count,
         updated_date: now,
       })
-      .eq("id", command.groupId)
-      .eq("user_id", command.userId);
+      .eq("id", command.group_id)
+      .eq("user_id", command.user_id);
 
     if (updateError) {
       // Log error but don't fail the request as this is not critical
       // TODO: Implement proper error logging
     }
 
-    // Transform response to match DTO camelCase format
-    return flashcards.map((card) => ({
-      id: card.id,
-      front: card.front,
-      back: card.back,
-      groupId: card.group_id,
-      userId: card.user_id,
-      source: card.source,
-      isApproved: card.is_approved,
-      creationDate: card.creation_date,
-      updatedDate: card.updated_date,
-    }));
+    return flashcards;
   }
 }

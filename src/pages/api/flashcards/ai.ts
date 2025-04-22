@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Generate flashcards
     const flashcards = await aiFlashcardsService.generateFlashcards({
       ...result.data,
-      userId: DEFAULT_USER_ID,
+      user_id: DEFAULT_USER_ID,
     });
 
     return new Response(JSON.stringify({ flashcards }), {
