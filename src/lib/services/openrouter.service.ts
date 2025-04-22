@@ -1,4 +1,4 @@
-import type { FlashcardAI } from "@/types";
+import type { FlashcardAI as FlashcardProposals } from "@/types";
 import { ERROR_MESSAGES } from "@/lib/constants";
 
 export class OpenRouterService {
@@ -11,7 +11,7 @@ export class OpenRouterService {
     }
   }
 
-  async generateFlashcards(prompt: string, count: number): Promise<FlashcardAI[]> {
+  async generateFlashcards(prompt: string, count: number): Promise<FlashcardProposals[]> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.maxResponseTime);
@@ -70,7 +70,7 @@ export class OpenRouterService {
       console.debug("Raw API response:", rawJson);
       console.debug("Structured API message:", rawJson.choices[0].message);
 
-      const flashcards = JSON.parse(rawJson.choices[0].message.content).flashcards as FlashcardAI[];
+      const flashcards = JSON.parse(rawJson.choices[0].message.content).flashcards as FlashcardProposals[];
       console.debug("Extracted flashcards:", flashcards);
 
       return flashcards;
