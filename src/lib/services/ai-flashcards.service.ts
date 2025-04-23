@@ -24,7 +24,6 @@ export class AIFlashcardsService {
 
     // Generate flashcards using AI
     const generatedCards = await this.openRouter.generateFlashcards(command.prompt, command.cards_count);
-    console.info("Generated flashcards:", generatedCards);
 
     // Save generated flashcards to database
     const now = new Date().toISOString();
