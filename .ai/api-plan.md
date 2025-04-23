@@ -34,12 +34,12 @@
     {
       "data": [{
         "id": "uuid",
-        "userId": "uuid",
+        "user_id": "uuid",
         "name": "string",
-        "creationDate": "2024-01-20T12:00:00Z",
-        "updatedDate": "2024-01-20T12:00:00Z",
-        "lastUsedPrompt": "string|null",
-        "lastUsedCardsCount": 0
+        "creation_date": "2024-01-20T12:00:00Z",
+        "updated_date": "2024-01-20T12:00:00Z",
+        "last_used_prompt": "string|null",
+        "last_used_cards_count": 0
       }],
       "pagination": {
         "page": 1,
@@ -72,13 +72,11 @@
 
 #### PUT /groups/{groupId}
 - **Method**: PUT  
-- **Description**: Update the name or associated AI prompt details of an existing group.
+- **Description**: Update the name.
 - **Request Payload**:
   ```json
   {
-    "name": "string",
-    "lastUsedPrompt": "string",         // optional, for storing latest AI prompt text (max 1000 characters)
-    "lastUsedCardsCount": "number"       // optional, number of flashcards to generate (max 20)
+    "name": "string"
   }
   ```
 - **Response**:
@@ -100,7 +98,7 @@
 - **Method**: GET  
 - **Description**: Retrieve a list of flashcards for the authenticated user. Supports filtering by group.
 - **Query Parameters**:
-  - `groupId` (optional): Filter flashcards by group.
+  - `group_id` (optional): Filter flashcards by group.
   - `source` (optional): Filter by source ('manual' or 'ai').
   - `page` (optional): Page number.
   - `limit` (optional): Items per page. `20` as default.
@@ -114,12 +112,12 @@
         "id": "uuid",
         "front": "string",
         "back": "string",
-        "creationDate": "2024-01-20T12:00:00Z",
-        "updatedDate": "2024-01-20T12:00:00Z",
+        "creation_date": "2024-01-20T12:00:00Z",
+        "updated_date": "2024-01-20T12:00:00Z",
         "source": "manual|ai",
-        "isApproved": true,
-        "userId": "uuid",
-        "groupId": "uuid"
+        "is_approved": true,
+        "user_id": "uuid",
+        "group_id": "uuid"
       }],
       "pagination": {
         "page": 1,
@@ -138,14 +136,14 @@
   {
     "front": "string (max 100 characters)",
     "back": "string (max 100 characters)",
-    "groupId": "UUID"
+    "group_id": "UUID"
   }
   ```
 - **Response**:
   - **Success**: 201 Created with created flashcard details.
   - **Error**: 400 Bad Request (validation errors like character limits), 401 Unauthorized.
 - **Business Logic**:
-  - This is an endpoint for manual card generation `source` should be set to "manual" automatically.
+  - This is an endpoint for manual card generation; `source` should be set to "manual" automatically.
 
 #### GET /flashcards/{flashcardId}
 - **Method**: GET  
@@ -157,12 +155,12 @@
       "id": "uuid",
       "front": "string",
       "back": "string",
-      "creationDate": "2024-01-20T12:00:00Z",
-      "updatedDate": "2024-01-20T12:00:00Z",
+      "creation_date": "2024-01-20T12:00:00Z",
+      "updated_date": "2024-01-20T12:00:00Z",
       "source": "manual|ai",
-      "isApproved": true,
-      "userId": "uuid",
-      "groupId": "uuid"
+      "is_approved": true,
+      "user_id": "uuid",
+      "group_id": "uuid"
     }
     ```
   - **Error**: 401 Unauthorized, 404 Not Found.
@@ -175,7 +173,7 @@
   {
     "front": "string (max 100 characters)",
     "back": "string (max 100 characters)",
-    "isApproved": "boolean"
+    "is_approved": "boolean"
   }
   ```
 - **Response**:
@@ -199,9 +197,9 @@
 - **Request Payload**:
   ```json
   {
-    "groupId": "UUID",
+    "group_id": "UUID",
     "prompt": "string (min 50, max 5000 characters)",
-    "cardsCount": "number (max 50)"
+    "cards_count": "number (max 50)"
   }
   ```
 - **Response**:
@@ -212,18 +210,18 @@
         "id": "uuid",
         "front": "string",
         "back": "string",
-        "creationDate": "2024-01-20T12:00:00Z",
-        "updatedDate": "2024-01-20T12:00:00Z",
+        "creation_date": "2024-01-20T12:00:00Z",
+        "updated_date": "2024-01-20T12:00:00Z",
         "source": "ai",
-        "isApproved": false,
-        "userId": "uuid",
-        "groupId": "uuid"
+        "is_approved": false,
+        "user_id": "uuid",
+        "group_id": "uuid"
       }]
     }
     ```
   - **Error**: 400 Bad Request (if prompt length < 50 or > 5000, or cards_count > 50), 401 Unauthorized.
 - **Business Logic**:
-  - Store the last used prompt and the number of flashcards in the corresponding flashcards group (`lastUsedPrompt` and `lastUsedCardsCount`).
+  - Store the last used prompt and the number of flashcards in the corresponding flashcards group (`last_used_prompt` and `last_used_cards_count`).
   - Validate input (length and count restrictions) and log detailed error information if validation fails.
   - Store all generated flashcards in the DB setting `source = ai` and `is_approved = false`.
 

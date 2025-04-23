@@ -9,9 +9,9 @@ An endpoint for generating flashcards using artificial intelligence. Takes a pro
 - Request Body:
   ```typescript
   {
-    groupId: string;    // Group UUID
-    prompt: string;     // min 50, max 5000 characters
-    cardsCount: number; // max 50 flashcards
+    group_id: string;    // Group UUID
+    prompt: string;      // min 50, max 5000 characters
+    cards_count: number; // max 50 flashcards
   }
   ```
 
@@ -24,9 +24,9 @@ import { AICreateFlashcardCommand } from '@/types';
 import { z } from 'zod';
 
 const AIFlashcardsRequestSchema = z.object({
-  groupId: z.string().uuid(),
+  group_id: z.string().uuid(),
   prompt: z.string().min(50).max(5000),
-  cardsCount: z.number().int().min(1).max(50)
+  cards_count: z.number().int().min(1).max(50)
 });
 
 // Response DTO
@@ -50,12 +50,12 @@ interface FlashcardAI {
         id: string;
         front: string;
         back: string;
-        creationDate: string;
-        updatedDate: string;
+        creation_date: string;
+        updated_date: string;
         source: "ai";
-        isApproved: false;
-        userId: string;
-        groupId: string;
+        is_approved: false;
+        user_id: string;
+        group_id: string;
       }
     ]
   }
