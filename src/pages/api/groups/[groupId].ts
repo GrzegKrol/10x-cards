@@ -2,19 +2,13 @@ import type { APIRoute } from "astro";
 import { GroupService } from "@/lib/services/group.service";
 import { GroupIdSchema, UpdateGroupSchema } from "@/lib/schemas/groups.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID, type SupabaseClient } from "@/db/supabase.client";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
 
-// Initialize service at module level with empty supabase client
-const groupService = new GroupService({} as SupabaseClient);
-
 export const GET: APIRoute = async ({ params, locals }) => {
   try {
-    // Update service with current supabase instance
-    groupService.setSupabase(locals.supabase);
-
     // Validate group ID
     const result = GroupIdSchema.safeParse({ id: params.groupId });
 
@@ -23,6 +17,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     // Fetch group using service
+    const groupService = new GroupService(locals.supabase);
     const group = await groupService.getGroup(result.data.id, DEFAULT_USER_ID);
 
     return new Response(JSON.stringify(group), {
@@ -46,8 +41,8 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const PUT: APIRoute = async ({ request, params, locals }) => {
   try {
-    // Update service with current supabase instance
-    groupService.setSupabase(locals.supabase);
+    // Create service instance with current supabase client
+    const groupService = new GroupService(locals.supabase);
 
     // Validate groupId
     const idResult = GroupIdSchema.safeParse({ id: params.groupId });

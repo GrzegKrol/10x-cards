@@ -4,11 +4,7 @@ import type { GroupsListQuery, CreateGroupRequest, UpdateGroupRequest } from "@/
 import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
 
 export class GroupService {
-  constructor(private supabase: SupabaseClient) {}
-
-  setSupabase(supabase: SupabaseClient) {
-    this.supabase = supabase;
-  }
+  constructor(private readonly supabase: SupabaseClient) {}
 
   async getGroups(query: GroupsListQuery, userId: string): Promise<GroupsListDTO> {
     // Calculate pagination

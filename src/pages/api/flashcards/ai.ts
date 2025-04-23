@@ -47,11 +47,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // Initialize services
+    // Initialize services just before usage
     const openRouter = new OpenRouterService(import.meta.env.OPENROUTER_API_KEY);
     const aiFlashcardsService = new AIFlashcardsService(locals.supabase, openRouter);
-
-    // Generate flashcards
     const flashcards = await aiFlashcardsService.generateFlashcards({
       ...result.data,
       user_id: DEFAULT_USER_ID,

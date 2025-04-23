@@ -2,19 +2,13 @@ import type { APIRoute } from "astro";
 import { GroupService } from "@/lib/services/group.service";
 import { GroupsListQuerySchema, CreateGroupSchema } from "@/lib/schemas/groups.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID, type SupabaseClient } from "@/db/supabase.client";
+import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
 
-// Initialize service at module level with empty supabase client
-const groupService = new GroupService({} as SupabaseClient);
-
 export const GET: APIRoute = async ({ request, locals }) => {
   try {
-    // Update service with current supabase instance
-    groupService.setSupabase(locals.supabase);
-
     // Parse and validate query parameters
     const url = new URL(request.url);
     const queryParams = Object.fromEntries(url.searchParams);
@@ -24,6 +18,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
       return handleValidationError(result.error);
     }
 
+    const groupService = new GroupService(locals.supabase);
     const response = await groupService.getGroups(result.data, DEFAULT_USER_ID);
 
     return new Response(JSON.stringify(response), {
@@ -43,9 +38,6 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // Update service with current supabase instance
-    groupService.setSupabase(locals.supabase);
-
     // Parse and validate request body
     let body;
     try {
@@ -61,6 +53,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     // Create group using service
+    const groupService = new GroupService(locals.supabase);
     const group = await groupService.createGroup(result.data, DEFAULT_USER_ID);
 
     return new Response(JSON.stringify(group), {
