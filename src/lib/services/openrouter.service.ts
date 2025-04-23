@@ -24,7 +24,7 @@ export class OpenRouterService {
           "X-Title": "10x Cards Flashcard Generator",
         },
         body: JSON.stringify({
-          model: "google/gemma-3-27b-it:free",
+          model: "google/learnlm-1.5-pro-experimental:free",
           messages: [
             {
               role: "system",
