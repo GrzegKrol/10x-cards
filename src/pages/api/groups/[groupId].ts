@@ -41,9 +41,6 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 export const PUT: APIRoute = async ({ request, params, locals }) => {
   try {
-    // Create service instance with current supabase client
-    const groupService = new GroupService(locals.supabase);
-
     // Validate groupId
     const idResult = GroupIdSchema.safeParse({ id: params.groupId });
     if (!idResult.success) {
@@ -64,6 +61,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
     }
 
     // Update group using service
+    const groupService = new GroupService(locals.supabase);
     const group = await groupService.updateGroup(idResult.data.id, result.data, DEFAULT_USER_ID);
 
     return new Response(JSON.stringify(group), {
