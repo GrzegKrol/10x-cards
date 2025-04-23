@@ -58,9 +58,9 @@ Retrieves a list of flashcard groups for the authenticated user, supporting pagi
 - Utilize an index on the `updated_date` field.
 
 ### 9. Implementation Steps
-1. Define the parameter validation schema (using Zod).
-2. Implement the service function in `src/lib/services/groupService.ts`.
-3. Create the endpoint in `src/pages/api/group.ts`.
+1. Define the parameter validation schema (using Zod) in `src/lib/schemas/groups.schema.ts`.
+2. Implement the service function in `src/lib/services/group.service.ts`.
+3. Create the endpoint in `src/pages/api/groups.ts`.
 4. Test the endpoint and update the documentation.
 
 ---
@@ -117,9 +117,9 @@ Creates a new flashcard group for the authenticated user.
 - Minimize the number of database operations.
 
 ### 9. Implementation Steps
-1. Define the input validation schema (using Zod).
-2. Implement the service function for creating groups in `src/lib/services/groupService.ts`.
-3. Create the endpoint in `src/pages/api/group.ts` for the POST method.
+1. Define the input validation schema in `src/lib/schemas/groups.schema.ts`.
+2. Implement the service function for creating groups in `src/lib/services/group.service.ts`.
+3. Create the endpoint in `src/pages/api/groups.ts` for the POST method.
 4. Test using tools like Postman and update the documentation.
 
 ---
@@ -169,9 +169,9 @@ Retrieves details of a specific flashcard group based on its identifier.
 - Optimize database queries by indexing columns used for searching.
 
 ### 9. Implementation Steps
-1. Define validation for `group_id` (UUID).
-2. Implement the service function in `src/lib/services/groupService.ts` to fetch group details.
-3. Create the endpoint in `src/pages/api/group.ts`.
+1. Define validation for `group_id` (UUID) in `src/lib/schemas/groups.schema.ts`.
+2. Implement the service function in `src/lib/services/group.service.ts` to fetch group details.
+3. Create the endpoint in `src/pages/api/groups/[groupId].ts`.
 4. Test the endpoint and update the documentation.
 
 ---
@@ -232,8 +232,8 @@ Updates the name of an existing flashcard group for the authenticated user.
 - Optimize queries by using indexes on `id` and `user_id`.
 
 ### 9. Implementation Steps
-1. Define validation for `group_id` and Request Body using Zod.
-2. Implement the service function in `src/lib/services/groupService.ts` to update the group.
-3. Create the endpoint in `src/pages/api/group.ts` handling the PUT method.
+1. Define validation for `group_id` and Request Body in `src/lib/schemas/groups.schema.ts`.
+2. Implement the service function in `src/lib/services/group.service.ts` to update the group.
+3. Create the endpoint in `src/pages/api/groups/[groupId].ts` handling the PUT method.
 4. Test the endpoint in various scenarios (valid data, invalid data, non-existent group).
 5. Update the API documentation.

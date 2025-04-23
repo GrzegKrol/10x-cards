@@ -2,6 +2,7 @@ export const ERROR_MESSAGES = {
   GROUP_NOT_FOUND: "Group not found or access denied",
   VALIDATION_FAILED: "Validation failed",
   SAVE_FLASHCARDS_FAILED: "Failed to save flashcards",
+  SAVE_GROUP_FAILED: "Failed to save group",
   OPENROUTER_ERROR: "OpenRouter API error",
   INTERNAL_ERROR: "Internal server error",
 } as const;
