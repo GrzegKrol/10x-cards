@@ -2,9 +2,9 @@ import { Button } from "@/components/ui/button";
 import { useGroupDetails } from "@/components/hooks/useGroupDetails";
 import Header from "@/components/Header";
 import GroupInfoSection from "@/components/groups/details/GroupInfoSection";
-import AIGenerationForm from "@/components/groups/details/AIGenerationForm";
 import FlashcardsList from "@/components/groups/details/FlashcardsList";
 import FlashcardModal from "@/components/groups/details/FlashcardModal";
+import AIFlashcardModal from "@/components/groups/details/AIFlashcardModal";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 interface GroupDetailsPageProps {
@@ -54,16 +54,16 @@ export default function GroupDetailsPage({ groupId }: GroupDetailsPageProps) {
               <GroupInfoSection group={group} onUpdate={updateGroup} />
             </ErrorBoundary>
             <div className="flex justify-end gap-4">
+              <AIFlashcardModal
+                groupId={group.id}
+                onSuccess={fetchGroup}
+                lastUsedPrompt={group.last_used_prompt}
+                lastUsedCardsCount={group.last_used_cards_count}
+              />
               <FlashcardModal groupId={group.id} onSuccess={fetchGroup} />
             </div>
             <ErrorBoundary>
               <FlashcardsList groupId={group.id} />
-            </ErrorBoundary>
-          </div>
-
-          <div className="space-y-8">
-            <ErrorBoundary>
-              <AIGenerationForm group={group} onSuccess={fetchGroup} />
             </ErrorBoundary>
           </div>
         </div>
