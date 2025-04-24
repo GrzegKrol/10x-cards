@@ -28,7 +28,7 @@ export class OpenRouterService {
           messages: [
             {
               role: "system",
-              content: `You are a flashcard generation assistant. Generate ${count} flashcards based on the given text. 
+              content: `You are a flashcard generation assistant. Generate maximum ${count} flashcards based on the given text. 
               Each flashcard should have "front" and "back" properties, with text not exceeding 100 characters per side.
               Format the response as a raw JSON object with a "flashcards" array containing the generated flashcards. Do not add '\`\`\`json' prefix or new line characters'`,
             },

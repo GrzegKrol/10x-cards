@@ -14,8 +14,8 @@ export const FlashcardsListQuerySchema = z.object({
     .default("20")
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().int().positive().max(100)),
-  sort: z.enum(["updated_date", "creation_date"]).optional().default("updated_date"),
-  order: z.enum(["asc", "desc"]).optional().default("desc"),
+  sort: z.enum(["front", "updated_date", "creation_date"]).optional().default("front"),
+  order: z.enum(["asc", "desc"]).optional().default("asc"),
   source: z.enum(["manual", "ai"]).optional(),
 });
 

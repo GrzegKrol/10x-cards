@@ -13,8 +13,8 @@ export const GroupsListQuerySchema = z.object({
     .default("20")
     .transform((val) => parseInt(val, 10))
     .pipe(z.number().int().positive().max(100)),
-  sort: z.enum(["updated_date", "name"]).optional().default("updated_date"),
-  order: z.enum(["asc", "desc"]).optional().default("desc"),
+  sort: z.enum(["name", "updated_date", "name"]).optional().default("name"),
+  order: z.enum(["asc", "desc"]).optional().default("asc"),
 });
 
 export type GroupsListQuery = z.infer<typeof GroupsListQuerySchema>;

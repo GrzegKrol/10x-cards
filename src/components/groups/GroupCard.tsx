@@ -7,6 +7,7 @@ interface GroupCardProps {
 
 export default function GroupCard({ group }: GroupCardProps) {
   const lastUpdated = new Date(group.updated_date).toLocaleDateString();
+  const created = new Date(group.creation_date).toLocaleDateString();
   const cardsCount = group.last_used_cards_count || 0;
 
   const handleCardClick = () => {
@@ -24,14 +25,9 @@ export default function GroupCard({ group }: GroupCardProps) {
       <CardHeader>
         <CardTitle className="line-clamp-2">{group.name}</CardTitle>
       </CardHeader>
-      <CardContent>
-        {group.last_used_prompt && (
-          <p className="text-sm text-muted-foreground line-clamp-2">Last prompt: {group.last_used_prompt}</p>
-        )}
-      </CardContent>
       <CardFooter className="flex flex-col sm:flex-row justify-between gap-2 text-sm text-muted-foreground">
         <span className="flex-shrink-0">Updated: {lastUpdated}</span>
-        <span className="flex-shrink-0">{cardsCount} cards</span>
+        <span className="flex-shrink-0">Created: {created}</span>
       </CardFooter>
     </Card>
   );
