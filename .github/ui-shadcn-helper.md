@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 # Shadcn UI Components
 
 This project uses @shadcn/ui for user interface components. They are beautifully designed, accessible components that can be customized for your application.
