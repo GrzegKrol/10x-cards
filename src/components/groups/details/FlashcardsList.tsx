@@ -158,7 +158,7 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
         {flashcards.map((flashcard) => (
           <Card
             key={flashcard.id}
-            className="h-full cursor-pointer hover:bg-accent/50 transition-colors relative"
+            className="h-full cursor-pointer hover:bg-accent/50 transition-colors relative py-2"
             onClick={(e) => {
               if ((e.target as HTMLElement).closest(".approval-switch, .delete-button")) {
                 e.stopPropagation();
@@ -170,7 +170,7 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
             role="button"
             aria-label={`Edit flashcard: Front - ${flashcard.front}, Back - ${flashcard.back}`}
           >
-            <CardHeader className="flex flex-row items-start justify-between space-x-2 py-2 px-4">
+            <CardHeader className="flex flex-row items-start justify-between space-x-2 py-1 px-4">
               <Button
                 variant="ghost"
                 size="icon"
