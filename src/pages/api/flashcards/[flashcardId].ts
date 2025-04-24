@@ -80,3 +80,32 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
     );
   }
 };
+
+export const DELETE: APIRoute = async ({ params, locals }) => {
+  try {
+    const { flashcardId } = params;
+
+    if (!flashcardId) {
+      return createErrorResponse("Flashcard ID is required", undefined, 400);
+    }
+
+    const flashcardService = new FlashcardService(locals.supabase);
+    await flashcardService.deleteFlashcard(flashcardId, DEFAULT_USER_ID);
+
+    return new Response(null, { status: 204 });
+  } catch (error: unknown) {
+    // eslint-disable-next-line no-console
+    console.error("Error deleting flashcard:", error);
+
+    if (error instanceof Error) {
+      if (error.message === ERROR_MESSAGES.FLASHCARD_NOT_FOUND) {
+        return createErrorResponse(ERROR_MESSAGES.FLASHCARD_NOT_FOUND, undefined, 404);
+      }
+    }
+
+    return createErrorResponse(
+      ERROR_MESSAGES.INTERNAL_ERROR,
+      error instanceof Error ? error.message : "Unknown error occurred"
+    );
+  }
+};

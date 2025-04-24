@@ -105,4 +105,19 @@ export class FlashcardService {
 
     return result.data;
   }
+
+  async deleteFlashcard(flashcardId: string, userId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from(DB_TABLES.FLASHCARD)
+      .delete()
+      .eq("id", flashcardId)
+      .eq("user_id", userId);
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        throw new Error(ERROR_MESSAGES.FLASHCARD_NOT_FOUND);
+      }
+      throw new Error(ERROR_MESSAGES.DELETE_FLASHCARD_FAILED);
+    }
+  }
 }

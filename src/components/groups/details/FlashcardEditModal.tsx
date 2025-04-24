@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,19 +9,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import type { CreateFlashcardCommand } from "@/types";
+import { Switch } from "@/components/ui/switch";
+import type { FlashcardDTO, UpdateFlashcardCommand } from "@/types";
 
-interface FlashcardModalProps {
-  groupId: string;
+interface FlashcardEditModalProps {
+  flashcard: FlashcardDTO | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export default function FlashcardModal({ groupId, onSuccess }: FlashcardModalProps) {
-  const [open, setOpen] = useState(false);
-  const [front, setFront] = useState("");
-  const [back, setBack] = useState("");
+export default function FlashcardEditModal({ flashcard, open, onOpenChange, onSuccess }: FlashcardEditModalProps) {
+  const [front, setFront] = useState(flashcard?.front ?? "");
+  const [back, setBack] = useState(flashcard?.back ?? "");
+  const [isApproved, setIsApproved] = useState(flashcard?.is_approved ?? false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,78 +49,55 @@ export default function FlashcardModal({ groupId, onSuccess }: FlashcardModalPro
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateInput()) return;
+    if (!flashcard || !validateInput()) return;
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      const command: CreateFlashcardCommand = {
+      const command: UpdateFlashcardCommand = {
         front: front.trim(),
         back: back.trim(),
-        group_id: groupId,
+        is_approved: isApproved,
       };
 
-      const response = await fetch("/api/flashcards", {
-        method: "POST",
+      const response = await fetch(`/api/flashcards/${flashcard.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(command),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create flashcard");
+        throw new Error("Failed to update flashcard");
       }
 
-      setOpen(false);
-      setFront("");
-      setBack("");
+      onOpenChange(false);
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred while creating flashcard");
+      setError(err instanceof Error ? err.message : "An error occurred while updating flashcard");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-      handleSubmit(e);
+  // Reset form when flashcard changes
+  useEffect(() => {
+    if (flashcard) {
+      setFront(flashcard.front);
+      setBack(flashcard.back);
+      setIsApproved(flashcard.is_approved ?? false);
+      setError(null);
     }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setFront("");
-    setBack("");
-    setError(null);
-  };
+  }, [flashcard]);
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) {
-          handleClose();
-        }
-      }}
-    >
-      <DialogTrigger asChild onClick={() => setOpen(true)}>
-        <Button className="w-full sm:w-auto" aria-label="Add new flashcard">
-          Add Flashcard
-        </Button>
-      </DialogTrigger>
-      <DialogContent
-        className="sm:max-w-md"
-        onKeyDown={handleKeyDown}
-        aria-labelledby="dialog-title"
-        aria-describedby="dialog-description"
-      >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md" aria-labelledby="dialog-title" aria-describedby="dialog-description">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle id="dialog-title">Create New Flashcard</DialogTitle>
+            <DialogTitle id="dialog-title">Edit Flashcard</DialogTitle>
             <DialogDescription id="dialog-description">
-              Add a new flashcard to your group. Enter the front and back text below.
+              Edit the front and back text of your flashcard below.
             </DialogDescription>
           </DialogHeader>
 
@@ -165,6 +144,11 @@ export default function FlashcardModal({ groupId, onSuccess }: FlashcardModalPro
               <p className="text-sm text-muted-foreground">{100 - back.length} characters remaining</p>
             </div>
 
+            <div className="flex items-center space-x-2">
+              <Switch id="approved" checked={isApproved} onCheckedChange={setIsApproved} disabled={isSubmitting} />
+              <Label htmlFor="approved">Approved</Label>
+            </div>
+
             {error && (
               <p id="card-error" className="text-sm text-destructive" role="alert">
                 {error}
@@ -173,11 +157,11 @@ export default function FlashcardModal({ groupId, onSuccess }: FlashcardModalPro
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="secondary" onClick={handleClose} disabled={isSubmitting}>
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Flashcard"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

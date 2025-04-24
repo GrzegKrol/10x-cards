@@ -16,6 +16,7 @@ export default function AIGenerationForm({ group, onSuccess }: AIGenerationFormP
   const [cardsCount, setCardsCount] = useState(group.last_used_cards_count || 10);
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastGeneratedPrompt, setLastGeneratedPrompt] = useState<string | null>(null);
 
   const validateInput = () => {
     if (!prompt.trim()) {
@@ -66,12 +67,21 @@ export default function AIGenerationForm({ group, onSuccess }: AIGenerationFormP
         throw new Error("Failed to generate flashcards");
       }
 
+      setLastGeneratedPrompt(prompt.trim());
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred while generating flashcards");
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleContinueIteration = () => {
+    if (!lastGeneratedPrompt) return;
+
+    setPrompt(
+      `Based on the previous prompt "${lastGeneratedPrompt}", please generate more flashcards with these improvements: `
+    );
   };
 
   const remainingChars = 5000 - prompt.length;
@@ -140,9 +150,16 @@ export default function AIGenerationForm({ group, onSuccess }: AIGenerationFormP
             </p>
           )}
 
-          <Button type="submit" disabled={isGenerating} aria-busy={isGenerating} className="w-full sm:w-auto">
-            {isGenerating ? "Generating..." : "Generate Flashcards"}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button type="submit" disabled={isGenerating} aria-busy={isGenerating} className="w-full sm:w-auto">
+              {isGenerating ? "Generating..." : "Generate Flashcards"}
+            </Button>
+            {lastGeneratedPrompt && (
+              <Button type="button" variant="secondary" onClick={handleContinueIteration} disabled={isGenerating}>
+                Continue to iterate?
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>

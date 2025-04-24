@@ -5,6 +5,9 @@ export const ERROR_MESSAGES = {
   SAVE_GROUP_FAILED: "Failed to save group",
   OPENROUTER_ERROR: "OpenRouter API error",
   INTERNAL_ERROR: "Internal server error",
+  FLASHCARD_NOT_FOUND: "Flashcard not found",
+  DELETE_FLASHCARD_FAILED: "Failed to delete flashcard",
+  UNAUTHORIZED_ACCESS: "You don't have permission to perform this action",
 } as const;
 
 export const HTTP_HEADERS = {

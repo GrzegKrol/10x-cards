@@ -69,14 +69,7 @@ export default function GroupInfoSection({ group, onUpdate }: GroupInfoSectionPr
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="group-name">Name</Label>
-            {!isEditing && (
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-8">
-                Edit
-              </Button>
-            )}
-          </div>
+          <Label htmlFor="group-name">Name</Label>
           {isEditing ? (
             <div className="space-y-2">
               <Input
@@ -121,7 +114,14 @@ export default function GroupInfoSection({ group, onUpdate }: GroupInfoSectionPr
               </div>
             </div>
           ) : (
-            <p className="text-lg font-medium">{group.name}</p>
+            <button
+              type="button"
+              className="text-lg font-medium hover:text-primary w-full text-left transition-colors p-2 -m-2 rounded-md hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+              onClick={() => setIsEditing(true)}
+              aria-label="Click to edit group name"
+            >
+              {group.name}
+            </button>
           )}
         </div>
 
