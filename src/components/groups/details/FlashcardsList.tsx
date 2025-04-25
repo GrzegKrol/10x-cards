@@ -114,7 +114,7 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
 
       setFlashcards((cards) => cards.filter((card) => card.id !== flashcard.id));
     } catch (error) {
-      // Show error in UI
+      console.error("Failed to delete flashcard:", error);
       alert("Failed to delete flashcard. Please try again.");
     } finally {
       setUpdatingCardId(null);
