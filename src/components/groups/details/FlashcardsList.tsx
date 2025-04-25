@@ -30,8 +30,6 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
           group_id: groupId,
           page: pageNumber.toString(),
           limit: "20",
-          sort: "updated_date",
-          order: "desc",
         });
 
         const response = await fetch(`/api/flashcards?${searchParams}`);

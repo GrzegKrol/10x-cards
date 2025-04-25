@@ -65,11 +65,7 @@ export default function GroupInfoSection({ group, onUpdate }: GroupInfoSectionPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Group Information</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="group-name">Name</Label>
           {isEditing ? (
             <div className="space-y-2">
               <Input
@@ -124,14 +120,15 @@ export default function GroupInfoSection({ group, onUpdate }: GroupInfoSectionPr
             </button>
           )}
         </div>
-
+      </CardHeader>
+      <CardContent className="space-y-6">
         <div className="space-y-4 pt-4 border-t">
           <p className="text-sm text-muted-foreground">Last updated: {formattedDate}</p>
           {group.last_used_prompt && (
             <div className="space-y-2">
               <Label>Last Used Prompt</Label>
               <p className="text-sm text-muted-foreground line-clamp-3">{group.last_used_prompt}</p>
-              <p className="text-sm text-muted-foreground">Generated {group.last_used_cards_count || 0} cards</p>
+              <p className="text-sm text-muted-foreground">Generated max: {group.last_used_cards_count || 0}</p>
             </div>
           )}
         </div>
