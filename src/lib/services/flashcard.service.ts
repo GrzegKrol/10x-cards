@@ -120,4 +120,19 @@ export class FlashcardService {
       throw new Error(ERROR_MESSAGES.DELETE_FLASHCARD_FAILED);
     }
   }
+
+  async deleteGroupFlashcards(groupId: string, userId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from(DB_TABLES.FLASHCARD)
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+
+    if (error) {
+      if (error.code === "23503") {
+        throw new Error(ERROR_MESSAGES.GROUP_NOT_FOUND);
+      }
+      throw new Error(ERROR_MESSAGES.DELETE_FLASHCARD_FAILED);
+    }
+  }
 }

@@ -7,6 +7,7 @@ export const ERROR_MESSAGES = {
   INTERNAL_ERROR: "Internal server error",
   FLASHCARD_NOT_FOUND: "Flashcard not found",
   DELETE_FLASHCARD_FAILED: "Failed to delete flashcard",
+  DELETE_ALL_FLASHCARDS_FAILED: "Failed to delete all flashcards from group",
   UNAUTHORIZED_ACCESS: "You don't have permission to perform this action",
 } as const;
 

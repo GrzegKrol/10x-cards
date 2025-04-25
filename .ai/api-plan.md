@@ -83,9 +83,9 @@
   - **Success**: 200 OK with updated group details.
   - **Error**: 400 Bad Request (validation errors), 401 Unauthorized, 404 Not Found.
 
-#### DELETE /groups/{groupId}
+#### DELETE /groups/{groupId}/flashcards
 - **Method**: DELETE  
-- **Description**: Delete a specific flashcards group.
+- **Description**: Delete all flashcards from a given group.
 - **Response**:
   - **Success**: 200 OK or 204 No Content.
   - **Error**: 401 Unauthorized, 404 Not Found.

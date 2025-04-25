@@ -3,10 +3,17 @@ import Layout from "@/layouts/Layout.astro";
 import GroupDetailsPage from "@/components/groups/details/GroupDetailsPage";
 
 const { groupId } = Astro.params;
+
+if (!groupId) {
+  return Astro.redirect("/groups");
+}
+
+const breadcrumbs = [
+  { label: "Groups", href: "/groups" },
+  { label: "Group Details" }
+];
 ---
 
-<Layout title="Group Details | 10x Cards">
-  <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <GroupDetailsPage groupId={groupId} client:load />
-  </div>
+<Layout title="Group Details" breadcrumbs={breadcrumbs}>
+  <GroupDetailsPage client:load groupId={groupId} />
 </Layout>

@@ -1,16 +1,30 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Trash2 } from "lucide-react";
 import type { FlashcardsListDTO, FlashcardDTO, UpdateFlashcardCommand } from "@/types";
 import FlashcardEditModal from "./FlashcardEditModal";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FlashcardsListProps {
   groupId: string;
 }
 
-export default function FlashcardsList({ groupId }: FlashcardsListProps) {
+export interface FlashcardsListRef {
+  fetchFlashcards: (page?: number) => Promise<void>;
+}
+
+const FlashcardsList = forwardRef<FlashcardsListRef, FlashcardsListProps>(({ groupId }, ref) => {
   const [flashcards, setFlashcards] = useState<FlashcardDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +33,9 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
   const [selectedFlashcard, setSelectedFlashcard] = useState<FlashcardDTO | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [updatingCardId, setUpdatingCardId] = useState<string | null>(null);
+  const [isDeletionEnabled, setIsDeletionEnabled] = useState(false);
+  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   const fetchFlashcards = useCallback(
     async (pageNumber = 1) => {
@@ -48,6 +65,14 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
       }
     },
     [groupId]
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      fetchFlashcards,
+    }),
+    [fetchFlashcards]
   );
 
   useEffect(() => {
@@ -96,11 +121,7 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
   };
 
   const handleDeleteFlashcard = async (flashcard: FlashcardDTO, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening edit modal
-
-    if (!confirm("Are you sure you want to delete this flashcard?")) {
-      return;
-    }
+    e.stopPropagation();
 
     try {
       setUpdatingCardId(flashcard.id);
@@ -114,10 +135,34 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
 
       setFlashcards((cards) => cards.filter((card) => card.id !== flashcard.id));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Failed to delete flashcard:", error);
-      alert("Failed to delete flashcard. Please try again.");
+      setError(error instanceof Error ? error.message : "Failed to delete flashcard");
     } finally {
       setUpdatingCardId(null);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      setIsDeletingAll(true);
+      setError(null);
+      const response = await fetch(`/api/groups/${groupId}/flashcards`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete all flashcards");
+      }
+
+      setFlashcards([]);
+      setIsDeleteAllModalOpen(false);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete all flashcards:", error);
+      setError(error instanceof Error ? error.message : "Failed to delete all flashcards");
+    } finally {
+      setIsDeletingAll(false);
     }
   };
 
@@ -151,7 +196,53 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Flashcards</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Flashcards</h2>
+        <div className="flex items-center space-x-4">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="delete-mode"
+                    checked={isDeletionEnabled}
+                    onCheckedChange={setIsDeletionEnabled}
+                    aria-label="Enable deletion mode"
+                  />
+                  <Label htmlFor="delete-mode">Enable Deletion</Label>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle to enable or disable quick deletion of flashcards</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="destructive"
+                  onClick={() => setIsDeleteAllModalOpen(true)}
+                  aria-label="Delete all flashcards"
+                >
+                  Delete All
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Delete all flashcards in this group (requires confirmation)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 mb-4 text-sm text-destructive bg-destructive/10 rounded-md" role="alert">
+          {error}
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {flashcards.map((flashcard) => (
           <Card
@@ -169,16 +260,26 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
             aria-label={`Edit flashcard: Front - ${flashcard.front}, Back - ${flashcard.back}`}
           >
             <CardHeader className="flex flex-row items-start justify-between space-x-2 py-1 px-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="delete-button h-8 w-8 rounded-full hover:bg-destructive/90 hover:text-destructive-foreground"
-                onClick={(e) => handleDeleteFlashcard(flashcard, e)}
-                disabled={updatingCardId === flashcard.id}
-                aria-label="Delete flashcard"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="delete-button h-8 w-8 rounded-full hover:bg-destructive/90 hover:text-destructive-foreground"
+                      onClick={(e) => handleDeleteFlashcard(flashcard, e)}
+                      disabled={!isDeletionEnabled || updatingCardId === flashcard.id}
+                      aria-label="Delete flashcard"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isDeletionEnabled ? "Click to delete" : "Enable deletion mode to delete"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <div className="flex items-center space-x-2">
                 <span
                   className={`text-xs px-2 py-1 rounded-md ${
@@ -224,6 +325,25 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
         onSuccess={() => fetchFlashcards(1)}
       />
 
+      <Dialog open={isDeleteAllModalOpen} onOpenChange={setIsDeleteAllModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete All Flashcards</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete all flashcards from this group? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteAllModalOpen(false)} disabled={isDeletingAll}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAll} disabled={isDeletingAll}>
+              {isDeletingAll ? "Deleting..." : "Delete All"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {hasMore && (
         <div className="text-center pt-4">
           <button
@@ -237,4 +357,7 @@ export default function FlashcardsList({ groupId }: FlashcardsListProps) {
       )}
     </div>
   );
-}
+});
+
+FlashcardsList.displayName = "FlashcardsList";
+export default FlashcardsList;
