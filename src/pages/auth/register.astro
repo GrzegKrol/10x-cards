@@ -1,0 +1,13 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import RegisterForm from "@/components/auth/RegisterForm";
+
+export const prerender = false;
+---
+
+<AuthLayout
+  title="Create Account - 10x Cards"
+  description="Create your account to start using 10x Cards"
+>
+  <RegisterForm client:load onSubmit={() => {}} />
+</AuthLayout>

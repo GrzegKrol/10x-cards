@@ -1,0 +1,13 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import LoginForm from "@/components/auth/LoginForm";
+
+export const prerender = false;
+---
+
+<AuthLayout
+  title="Sign In - 10x Cards"
+  description="Sign in to your 10x Cards account to access your flashcards"
+>
+  <LoginForm client:load onSubmit={() => {}} />
+</AuthLayout>
