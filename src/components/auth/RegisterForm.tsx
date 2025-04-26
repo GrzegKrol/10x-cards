@@ -4,11 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface RegisterFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
-}
-
-export default function RegisterForm({ onSubmit }: RegisterFormProps) {
+export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,7 +39,21 @@ export default function RegisterForm({ onSubmit }: RegisterFormProps) {
     setError(null);
 
     try {
-      await onSubmit(email, password);
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create account");
+      }
+
+      window.location.href = "/groups";
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account");
     } finally {
