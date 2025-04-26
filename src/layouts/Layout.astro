@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { title = "10x Astro Starter", breadcrumbs = [] } = Astro.props;
+const { user } = Astro.locals;
 ---
 
 <!doctype html>
@@ -22,7 +23,7 @@ const { title = "10x Astro Starter", breadcrumbs = [] } = Astro.props;
   <body>
     <div class="min-h-screen">
       <div class="container mx-auto px-4">
-        <Header client:load breadcrumbs={breadcrumbs} />
+        <Header client:load breadcrumbs={breadcrumbs} user={user} />
         <main>
           <slot />
         </main>

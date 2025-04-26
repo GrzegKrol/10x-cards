@@ -7,9 +7,10 @@ interface Breadcrumb {
 
 interface HeaderProps {
   breadcrumbs: Breadcrumb[];
+  user?: { email: string } | null;
 }
 
-export default function Header({ breadcrumbs }: HeaderProps) {
+export default function Header({ breadcrumbs, user }: HeaderProps) {
   const handleLogout = async () => {
     try {
       const response = await fetch("/api/auth/logout", {
@@ -21,7 +22,7 @@ export default function Header({ breadcrumbs }: HeaderProps) {
         throw new Error("Logout failed");
       }
 
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Logout error:", error);
@@ -52,9 +53,18 @@ export default function Header({ breadcrumbs }: HeaderProps) {
           ))}
         </ol>
       </nav>
-      <Button variant="outline" onClick={handleLogout} className="text-sm" aria-label="Log out of your account">
-        Logout
-      </Button>
+      <div className="flex items-center gap-4">
+        {user?.email && <span className="text-sm text-muted-foreground">{user.email}</span>}
+        {user ? (
+          <Button variant="outline" onClick={handleLogout} className="text-sm" aria-label="Log out of your account">
+            Logout
+          </Button>
+        ) : (
+          <Button variant="outline" className="text-sm" aria-label="Log in to your account" asChild>
+            <a href="/auth/login">Login</a>
+          </Button>
+        )}
+      </div>
     </header>
   );
 }

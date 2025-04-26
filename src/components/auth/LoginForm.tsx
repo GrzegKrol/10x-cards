@@ -4,31 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface LoginFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
-}
-
-export default function LoginForm({ onSubmit }: LoginFormProps) {
+export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInput()) return;
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      await onSubmit(email, password);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to sign in");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const validateInput = () => {
     if (!email.trim()) {
@@ -40,6 +20,34 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
       return false;
     }
     return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateInput()) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid credentials");
+      }
+
+      window.location.href = "/groups";
+    } catch {
+      setError("Invalid credentials");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
