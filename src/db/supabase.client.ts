@@ -14,18 +14,22 @@ export const cookieOptions: CookieOptions = {
   sameSite: "lax",
 };
 
+function parseCookieHeader(cookieHeader: string): { name: string; value: string }[] {
+  return cookieHeader.split(";").map((cookie) => {
+    const [name, ...rest] = cookie.trim().split("=");
+    return { name, value: rest.join("=") };
+  });
+}
+
 export const createSupabaseServerInstance = (context: { headers: Headers; cookies: AstroCookies }) => {
   const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookieOptions,
     cookies: {
-      get(name: string) {
-        const cookie = context.cookies.get(name);
-        return cookie?.value;
+      getAll() {
+        return parseCookieHeader(context.headers.get("Cookie") ?? "");
       },
-      set(name: string, value: string, options?: CookieOptions) {
-        context.cookies.set(name, value, options);
-      },
-      remove(name: string, options?: CookieOptions) {
-        context.cookies.delete(name, options);
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => context.cookies.set(name, value, options));
       },
     },
   });
