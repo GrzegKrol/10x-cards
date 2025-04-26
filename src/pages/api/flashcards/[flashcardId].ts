@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { FlashcardService } from "@/lib/services/flashcard.service";
 import { FlashcardIdSchema, UpdateFlashcardSchema } from "@/lib/schemas/flashcards.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
@@ -17,7 +16,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    const flashcard = await flashcardService.getFlashcard(result.data.id, DEFAULT_USER_ID);
+    const flashcard = await flashcardService.getFlashcard(result.data.id);
 
     return new Response(JSON.stringify(flashcard), {
       status: 200,
@@ -29,6 +28,10 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     if (error instanceof Error && error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
       return createErrorResponse("Flashcard not found", undefined, 404);
+    }
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
     }
 
     return createErrorResponse(
@@ -60,7 +63,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    const flashcard = await flashcardService.updateFlashcard(idResult.data.id, result.data, DEFAULT_USER_ID);
+    const flashcard = await flashcardService.updateFlashcard(idResult.data.id, result.data);
 
     return new Response(JSON.stringify(flashcard), {
       status: 200,
@@ -72,6 +75,10 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
 
     if (error instanceof Error && error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
       return createErrorResponse("Flashcard not found", undefined, 404);
+    }
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
     }
 
     return createErrorResponse(
@@ -90,7 +97,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    await flashcardService.deleteFlashcard(flashcardId, DEFAULT_USER_ID);
+    await flashcardService.deleteFlashcard(flashcardId);
 
     return new Response(null, { status: 204 });
   } catch (error: unknown) {
@@ -100,6 +107,10 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     if (error instanceof Error) {
       if (error.message === ERROR_MESSAGES.FLASHCARD_NOT_FOUND) {
         return createErrorResponse(ERROR_MESSAGES.FLASHCARD_NOT_FOUND, undefined, 404);
+      }
+
+      if (error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+        return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
       }
     }
 

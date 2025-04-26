@@ -2,20 +2,23 @@ import type { SupabaseClient } from "@/db/supabase.client";
 import type { AICreateFlashcardCommand, FlashcardDTO } from "@/types";
 import { OpenRouterService } from "./openrouter.service";
 import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
+import { getUserIdFromSession } from "@/lib/utils";
 
 export class AIFlashcardsService {
   constructor(
-    private supabase: SupabaseClient,
-    private openRouter: OpenRouterService
+    private readonly supabase: SupabaseClient,
+    private readonly openRouter: OpenRouterService
   ) {}
 
-  async generateFlashcards(command: AICreateFlashcardCommand): Promise<FlashcardDTO[]> {
+  async generateFlashcards(command: Omit<AICreateFlashcardCommand, "user_id">): Promise<FlashcardDTO[]> {
+    const userId = await getUserIdFromSession(this.supabase);
+
     // Verify group exists and user has access
     const { data: group, error: groupError } = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .select("id")
       .eq("id", command.group_id)
-      .eq("user_id", command.user_id)
+      .eq("user_id", userId)
       .single();
 
     if (groupError || !group) {
@@ -34,7 +37,7 @@ export class AIFlashcardsService {
           front: card.front,
           back: card.back,
           group_id: command.group_id,
-          user_id: command.user_id,
+          user_id: userId,
           source: "ai" as const,
           is_approved: false,
           creation_date: now,
@@ -60,11 +63,13 @@ export class AIFlashcardsService {
         updated_date: now,
       })
       .eq("id", command.group_id)
-      .eq("user_id", command.user_id);
+      .eq("user_id", userId);
 
     if (updateError) {
       // Log error but don't fail the request as this is not critical
       // TODO: Implement proper error logging
+      // eslint-disable-next-line no-console
+      console.error("Failed to update group metadata:", updateError);
     }
 
     return flashcards;

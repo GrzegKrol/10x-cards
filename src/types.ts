@@ -70,7 +70,6 @@ export interface AICreateFlashcardCommand {
   group_id: string; // UUID of the associated flashcard group
   prompt: string; // min 50, max 5000 characters
   cards_count: number; // maximum 50 flashcards to generate
-  user_id: string; // user ID for development
 }
 
 // OpenRouter API types

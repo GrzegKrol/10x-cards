@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { FlashcardService } from "@/lib/services/flashcard.service";
 import { ERROR_MESSAGES } from "@/lib/constants";
 import { createErrorResponse } from "@/lib/utils";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 
 export const prerender = false;
 
@@ -15,7 +14,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    await flashcardService.deleteGroupFlashcards(groupId, DEFAULT_USER_ID);
+    await flashcardService.deleteGroupFlashcards(groupId);
 
     return new Response(null, { status: 204 });
   } catch (error: unknown) {
@@ -25,6 +24,10 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     if (error instanceof Error) {
       if (error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
         return createErrorResponse(ERROR_MESSAGES.GROUP_NOT_FOUND, undefined, 404);
+      }
+
+      if (error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+        return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
       }
     }
 

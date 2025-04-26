@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { FlashcardService } from "@/lib/services/flashcard.service";
 import { FlashcardsListQuerySchema, CreateFlashcardSchema } from "@/lib/schemas/flashcards.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
@@ -19,7 +18,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    const response = await flashcardService.getFlashcards(result.data, DEFAULT_USER_ID);
+    const response = await flashcardService.getFlashcards(result.data);
 
     return new Response(JSON.stringify(response), {
       status: 200,
@@ -28,6 +27,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
   } catch (error: unknown) {
     // eslint-disable-next-line no-console
     console.error("Error fetching flashcards:", error);
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
+    }
 
     return createErrorResponse(
       ERROR_MESSAGES.INTERNAL_ERROR,
@@ -53,7 +56,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    const flashcard = await flashcardService.createFlashcard(result.data, DEFAULT_USER_ID);
+    const flashcard = await flashcardService.createFlashcard(result.data);
 
     return new Response(JSON.stringify(flashcard), {
       status: 201,
@@ -66,6 +69,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (error instanceof Error) {
       if (error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
         return createErrorResponse(ERROR_MESSAGES.GROUP_NOT_FOUND, undefined, 404);
+      }
+
+      if (error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+        return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
       }
 
       if (error.message.includes(ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED)) {
