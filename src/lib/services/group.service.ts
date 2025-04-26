@@ -6,7 +6,20 @@ import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
 export class GroupService {
   constructor(private readonly supabase: SupabaseClient) {}
 
-  async getGroups(query: GroupsListQuery, userId: string): Promise<GroupsListDTO> {
+  private async getUserId(): Promise<string> {
+    const {
+      data: { session },
+      error,
+    } = await this.supabase.auth.getSession();
+    if (error || !session?.user) {
+      throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+    }
+    return session.user.id;
+  }
+
+  async getGroups(query: GroupsListQuery): Promise<GroupsListDTO> {
+    const userId = await this.getUserId();
+
     // Calculate pagination
     const from = (query.page - 1) * query.limit;
     const to = from + query.limit - 1;
@@ -34,7 +47,9 @@ export class GroupService {
     };
   }
 
-  async createGroup(data: CreateGroupRequest, userId: string): Promise<FlashcardGroupDTO> {
+  async createGroup(data: CreateGroupRequest): Promise<FlashcardGroupDTO> {
+    const userId = await this.getUserId();
+
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .insert([
@@ -57,7 +72,9 @@ export class GroupService {
     return result.data;
   }
 
-  async getGroup(groupId: string, userId: string): Promise<FlashcardGroupDTO> {
+  async getGroup(groupId: string): Promise<FlashcardGroupDTO> {
+    const userId = await this.getUserId();
+
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .select()
@@ -72,7 +89,9 @@ export class GroupService {
     return result.data;
   }
 
-  async updateGroup(groupId: string, data: UpdateGroupRequest, userId: string): Promise<FlashcardGroupDTO> {
+  async updateGroup(groupId: string, data: UpdateGroupRequest): Promise<FlashcardGroupDTO> {
+    const userId = await this.getUserId();
+
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .update({

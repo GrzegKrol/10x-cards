@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { GroupService } from "@/lib/services/group.service";
 import { GroupIdSchema, UpdateGroupSchema } from "@/lib/schemas/groups.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
@@ -18,7 +17,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     // Fetch group using service
     const groupService = new GroupService(locals.supabase);
-    const group = await groupService.getGroup(result.data.id, DEFAULT_USER_ID);
+    const group = await groupService.getGroup(result.data.id);
 
     return new Response(JSON.stringify(group), {
       status: 200,
@@ -30,6 +29,10 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
     if (error instanceof Error && error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
       return createErrorResponse(ERROR_MESSAGES.GROUP_NOT_FOUND, undefined, 404);
+    }
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
     }
 
     return createErrorResponse(
@@ -62,7 +65,7 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
 
     // Update group using service
     const groupService = new GroupService(locals.supabase);
-    const group = await groupService.updateGroup(idResult.data.id, result.data, DEFAULT_USER_ID);
+    const group = await groupService.updateGroup(idResult.data.id, result.data);
 
     return new Response(JSON.stringify(group), {
       status: 200,
@@ -74,6 +77,10 @@ export const PUT: APIRoute = async ({ request, params, locals }) => {
 
     if (error instanceof Error && error.message === ERROR_MESSAGES.GROUP_NOT_FOUND) {
       return createErrorResponse(ERROR_MESSAGES.GROUP_NOT_FOUND, undefined, 404);
+    }
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
     }
 
     return createErrorResponse(

@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { GroupService } from "@/lib/services/group.service";
 import { GroupsListQuerySchema, CreateGroupSchema } from "@/lib/schemas/groups.schema";
 import { ERROR_MESSAGES, HTTP_HEADERS } from "@/lib/constants";
-import { DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createErrorResponse, handleValidationError } from "@/lib/utils";
 
 export const prerender = false;
@@ -19,7 +18,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     }
 
     const groupService = new GroupService(locals.supabase);
-    const response = await groupService.getGroups(result.data, DEFAULT_USER_ID);
+    const response = await groupService.getGroups(result.data);
 
     return new Response(JSON.stringify(response), {
       status: 200,
@@ -28,6 +27,10 @@ export const GET: APIRoute = async ({ request, locals }) => {
   } catch (error: unknown) {
     // eslint-disable-next-line no-console
     console.error("Error fetching groups:", error);
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
+    }
 
     return createErrorResponse(
       ERROR_MESSAGES.INTERNAL_ERROR,
@@ -54,7 +57,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Create group using service
     const groupService = new GroupService(locals.supabase);
-    const group = await groupService.createGroup(result.data, DEFAULT_USER_ID);
+    const group = await groupService.createGroup(result.data);
 
     return new Response(JSON.stringify(group), {
       status: 201,
@@ -63,6 +66,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error: unknown) {
     // eslint-disable-next-line no-console
     console.error("Error creating group:", error);
+
+    if (error instanceof Error && error.message === ERROR_MESSAGES.UNAUTHORIZED_ACCESS) {
+      return createErrorResponse(ERROR_MESSAGES.UNAUTHORIZED_ACCESS, "User not authenticated", 401);
+    }
 
     return createErrorResponse(
       ERROR_MESSAGES.INTERNAL_ERROR,
