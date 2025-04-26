@@ -44,7 +44,7 @@
 - Only flashcards created by the authenticated user can be modified.  
 - All actions on groups, flashcards, and AI generation require valid user authentication.  
 - User logs in using an email address and password.  
-- Registration requires an email address, password, and password confirmation.  
+- Registration requires an email address (validated on backend side), password (min 8 char long containing at least one: number, upper and lower case), and password confirmation.
 - Logout button is present in the top right corner on every subpage.  
 - No integration with external authentication services.  
 - Password recovery option is available for registered users.
