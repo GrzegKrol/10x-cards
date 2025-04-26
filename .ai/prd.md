@@ -1,4 +1,4 @@
-# User Stories dla projektu Flashcards Generation
+# User Stories for Flashcards Generation
 
 ## 1. Flashcard Groups
 
@@ -6,7 +6,7 @@
 **Description:** This functionality supports managing flashcard groups. Users can add, delete, view, and edit group names. Each group is assigned a unique ID even if names are duplicated. Additionally, users can delete all flashcards belonging to a group.  
 **Criteria:**  
 
-- Ability to add new groups.
+- Ability to add new groups.  
 - Ability to delete, view, and edit existing groups.  
 - Each group has a unique ID irrespective of duplicate names.  
 - Option to delete all flashcards associated with a group.
@@ -14,10 +14,10 @@
 ## 2. Flashcards
 
 **Title:** Flashcards  
-**Description:** This functionality allows users to manually create flashcards by providing necessary fields (front, back, creation date, last edit date, assigned user, and group). Every flashcard must belong to a group. Manual flashcards are auto-approved but can also be updated, approved, and deleted.  
+**Description:** This functionality allows users to manually create flashcards with required fields (front, back, creation date, last edit date, assigned user, and group). Each flashcard must belong to a group and can be updated, approved, or deleted.  
 **Criteria:**  
 
-- User can input required fields for flashcards.
+- User can input required fields for flashcards.  
 - Each flashcard must be associated with a group.  
 - Flashcards created manually are automatically approved.  
 - Flashcards can be updated, approved, and deleted.
@@ -28,7 +28,7 @@
 **Description:** This feature enables AI-assisted flashcard creation. It includes a text field limited to 1000 characters for the AI prompt and an option to select up to 50 flashcards to generate. AI-generated flashcards require user approval, and the system saves the most recent prompt along with the flashcard count when entering a group.  
 **Criteria:**  
 
-- Text field accepts a maximum of 1000 characters.
+- Text field accepts a maximum of 1000 characters.  
 - Option to select up to 50 flashcards for generation.  
 - AI-generated flashcards require user confirmation.  
 - Last entered AI prompt and flashcard count are stored when accessing group interfaces.
@@ -36,9 +36,15 @@
 ## 4. Security
 
 **Title:** Security  
-**Description:** This functionality ensures that access to flashcard groups, flashcards, and AI generation features is secured. Users must authenticate before accessing any content. After login, users can perform all actions from sections 1, 2, and 3; however, they are only permitted to modify flashcards that they personally created.  
+**Description:** Manages user authentication and authorization. Users log in using their email and password, and registration requires email, password, and confirmation. A logout button is available on every subpage and password recovery is supported.  
 **Criteria:**  
 
 - User must authenticate before viewing any groups or flashcards.
+- If user enters the direct URL to groups or flashcards view, redirection to the login page happens if user is not authenticated.
 - Only flashcards created by the authenticated user can be modified.  
-- All actions on groups, flashcards, and AI generation require valid user authentication.
+- All actions on groups, flashcards, and AI generation require valid user authentication.  
+- User logs in using an email address and password.  
+- Registration requires an email address, password, and password confirmation.  
+- Logout button is present in the top right corner on every subpage.  
+- No integration with external authentication services.  
+- Password recovery option is available for registered users.
