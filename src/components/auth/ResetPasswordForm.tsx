@@ -44,7 +44,7 @@ export default function ResetPasswordForm({ onSubmit }: ResetPasswordFormProps) 
       <Card className="w-[600px]">
         <CardHeader>
           <CardTitle>Check Your Email</CardTitle>
-          <CardDescription>We've sent password reset instructions to {email}</CardDescription>
+          <CardDescription>We&apos;ve sent password reset instructions to {email}</CardDescription>
         </CardHeader>
         <CardFooter>
           <Button variant="link" className="w-full" onClick={() => (window.location.href = "/auth/login")}>
