@@ -72,7 +72,7 @@ export default function LoginForm() {
               disabled={isSubmitting}
               aria-describedby={error ? "login-error" : undefined}
               required
-              data-test-id="email-input"
+              data-testId="email-input"
             />
           </div>
           <div className="space-y-2">
@@ -89,11 +89,11 @@ export default function LoginForm() {
               disabled={isSubmitting}
               aria-describedby={error ? "login-error" : undefined}
               required
-              data-test-id="password-input"
+              data-testId="password-input"
             />
           </div>
           {error && (
-            <p id="login-error" className="text-sm text-destructive" role="alert" data-test-id="login-error">
+            <p id="login-error" className="text-sm text-destructive" role="alert" data-testId="login-error">
               {error}
             </p>
           )}
@@ -104,7 +104,7 @@ export default function LoginForm() {
             className="w-full"
             disabled={isSubmitting}
             aria-busy={isSubmitting}
-            data-test-id="login-button"
+            data-testId="login-button"
           >
             {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>

@@ -33,7 +33,7 @@ export class GroupsPage extends BasePage {
 
   async getGroupByName(name: string): Promise<Locator | null> {
     const groups = await this.getGroupsList();
-    const groupItems = await groups.locator('[data-test-id^="group-item-"]').all();
+    const groupItems = await groups.locator('[data-testId^="group-item-"]').all();
 
     for (const item of groupItems) {
       const text = await item.textContent();

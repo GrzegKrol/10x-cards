@@ -17,7 +17,7 @@ export default function GroupsList() {
         className="flex items-center justify-center py-8"
         role="status"
         aria-label="Loading groups"
-        data-test-id="groups-loading"
+        data-testId="groups-loading"
       >
         <div
           className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"
@@ -30,9 +30,9 @@ export default function GroupsList() {
 
   if (error) {
     return (
-      <div className="py-8 text-center text-destructive" role="alert" aria-live="polite" data-test-id="groups-error">
+      <div className="py-8 text-center text-destructive" role="alert" aria-live="polite" data-testId="groups-error">
         <p>{error}</p>
-        <Button onClick={() => fetchGroups()} variant="link" className="mt-4" data-test-id="groups-retry">
+        <Button onClick={() => fetchGroups()} variant="link" className="mt-4" data-testId="groups-retry">
           Try again
         </Button>
       </div>
@@ -40,7 +40,7 @@ export default function GroupsList() {
   }
 
   return (
-    <div className="space-y-6" data-test-id="groups-container">
+    <div className="space-y-6" data-testId="groups-container">
       <div className="flex justify-end">
         <AddGroupForm onSubmit={createGroup} />
       </div>
@@ -50,7 +50,7 @@ export default function GroupsList() {
           className="py-8 text-center text-muted-foreground"
           role="status"
           aria-live="polite"
-          data-test-id="groups-empty"
+          data-testId="groups-empty"
         >
           <p>No groups found. Create your first group to get started!</p>
         </div>
@@ -59,10 +59,10 @@ export default function GroupsList() {
           className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
           role="list"
           aria-label="Flashcard groups"
-          data-test-id="groups-list"
+          data-testId="groups-list"
         >
           {groups.map((group) => (
-            <div key={group.id} role="listitem" data-test-id={`group-item-${group.id}`}>
+            <div key={group.id} role="listitem" data-testId={`group-item-${group.id}`}>
               <GroupCard group={group} />
             </div>
           ))}

@@ -60,7 +60,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full sm:w-auto" aria-label="Add new flashcard group" data-test-id="add-group-button">
+        <Button className="w-full sm:w-auto" aria-label="Add new flashcard group" data-testId="add-group-button">
           Add Group
         </Button>
       </DialogTrigger>
@@ -69,7 +69,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
         onKeyDown={handleKeyDown}
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
-        data-test-id="add-group-dialog"
+        data-testId="add-group-dialog"
       >
         <DialogHeader>
           <DialogTitle id="dialog-title">Create New Group</DialogTitle>
@@ -77,7 +77,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
             Add a new flashcard group. Enter a name for your group below.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4" data-test-id="add-group-form">
+        <form onSubmit={handleSubmit} className="space-y-4" data-testId="add-group-form">
           <div className="space-y-2">
             <Label htmlFor="group-name">Group Name</Label>
             <Input
@@ -94,7 +94,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
               aria-required="true"
               maxLength={100}
               className="w-full"
-              data-test-id="group-name-input"
+              data-testId="group-name-input"
             />
             {error && (
               <p
@@ -102,7 +102,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
                 className="text-sm text-destructive"
                 role="alert"
                 aria-live="polite"
-                data-test-id="group-name-error"
+                data-testId="group-name-error"
               >
                 {error}
               </p>
@@ -115,7 +115,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
               onClick={() => setOpen(false)}
               disabled={isSubmitting}
               className="w-full sm:w-auto"
-              data-test-id="cancel-group-button"
+              data-testId="cancel-group-button"
             >
               Cancel
             </Button>
@@ -124,7 +124,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
               disabled={isSubmitting}
               className="w-full sm:w-auto"
               aria-busy={isSubmitting}
-              data-test-id="submit-group-button"
+              data-testId="submit-group-button"
             >
               {isSubmitting ? "Creating..." : "Create Group"}
             </Button>
