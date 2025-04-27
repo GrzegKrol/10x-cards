@@ -54,7 +54,11 @@ export default function Header({ breadcrumbs, user }: HeaderProps) {
         </ol>
       </nav>
       <div className="flex items-center gap-4">
-        {user?.email && <span className="text-sm text-muted-foreground">{user.email}</span>}
+        {user?.email && (
+          <span className="text-sm text-muted-foreground" data-testid="user-email">
+            {user.email}
+          </span>
+        )}
         {user ? (
           <Button variant="outline" onClick={handleLogout} className="text-sm" aria-label="Log out of your account">
             Logout

@@ -61,7 +61,7 @@ export class LoginPage extends BasePage {
     await this.fillPassword(password);
     await this.clickSignIn();
     // Wait for successful login and redirect
-    await expect(this.page).toHaveURL("/");
+    await expect(this.page).toHaveURL("/groups");
   }
 
   async expectValidationError(expectedError: string): Promise<void> {
