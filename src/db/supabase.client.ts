@@ -26,6 +26,17 @@ export type ExtendedSupabaseClient = BaseSupabaseClient<Database> & {
   getUserIdFromSession(): Promise<string>;
 };
 
+// Define the function once here
+const createGetUserIdFromSession = (client: BaseSupabaseClient<Database>) => async () => {
+  const {
+    data: { user },
+  } = await client.auth.getUser();
+  if (!user) {
+    throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+  }
+  return user.id;
+};
+
 export const createSupabaseServerInstance = (context: {
   headers: Headers;
   cookies: AstroCookies;
@@ -42,33 +53,15 @@ export const createSupabaseServerInstance = (context: {
     },
   });
 
-  const getUserIdFromSession = async () => {
-    const {
-      data: { session },
-      error,
-    } = await baseClient.auth.getSession();
-    if (error || !session?.user) {
-      throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-    }
-    return session.user.id;
-  };
-
-  return Object.assign(baseClient, { getUserIdFromSession });
+  // Use the factory function to create getUserIdFromSession
+  return Object.assign(baseClient, { getUserIdFromSession: createGetUserIdFromSession(baseClient) });
 };
 
 const baseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
+// Use the same factory function for the client instance
 export const supabaseClient: ExtendedSupabaseClient = Object.assign(baseClient, {
-  async getUserIdFromSession() {
-    const {
-      data: { session },
-      error,
-    } = await baseClient.auth.getSession();
-    if (error || !session?.user) {
-      throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-    }
-    return session.user.id;
-  },
+  getUserIdFromSession: createGetUserIdFromSession(baseClient),
 });
 
 export type SupabaseClient = ExtendedSupabaseClient;
