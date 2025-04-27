@@ -72,6 +72,7 @@ export default function LoginForm() {
               disabled={isSubmitting}
               aria-describedby={error ? "login-error" : undefined}
               required
+              data-test-id="email-input"
             />
           </div>
           <div className="space-y-2">
@@ -88,16 +89,23 @@ export default function LoginForm() {
               disabled={isSubmitting}
               aria-describedby={error ? "login-error" : undefined}
               required
+              data-test-id="password-input"
             />
           </div>
           {error && (
-            <p id="login-error" className="text-sm text-destructive" role="alert">
+            <p id="login-error" className="text-sm text-destructive" role="alert" data-test-id="login-error">
               {error}
             </p>
           )}
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={isSubmitting} aria-busy={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+            data-test-id="login-button"
+          >
             {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>
           <div className="flex justify-between w-full text-sm">
