@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES } from "@/lib/constants";
+import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
 import type { SupabaseClient } from "@/db/supabase.client";
 import type {
   CreateFlashcardCommand,
@@ -18,7 +18,7 @@ export class FlashcardService {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    let baseQuery = this.supabase.from("flashcard").select("*", { count: "exact" }).eq("user_id", userId);
+    let baseQuery = this.supabase.from(DB_TABLES.FLASHCARD).select("*", { count: "exact" }).eq("user_id", userId);
 
     if (query.group_id) {
       baseQuery = baseQuery.eq("group_id", query.group_id);
@@ -60,7 +60,7 @@ export class FlashcardService {
     const userId = await this.supabase.getUserIdFromSession();
 
     const { data: flashcard, error } = await this.supabase
-      .from("flashcard")
+      .from(DB_TABLES.FLASHCARD)
       .insert({
         ...data,
         source: "manual",
@@ -83,7 +83,7 @@ export class FlashcardService {
     const userId = await this.supabase.getUserIdFromSession();
 
     const { data: flashcard, error } = await this.supabase
-      .from("flashcard")
+      .from(DB_TABLES.FLASHCARD)
       .update({
         ...data,
         updated_date: new Date().toISOString(),
@@ -106,11 +106,32 @@ export class FlashcardService {
   async deleteFlashcard(flashcardId: string): Promise<void> {
     const userId = await this.supabase.getUserIdFromSession();
 
-    const { error } = await this.supabase.from("flashcard").delete().eq("id", flashcardId).eq("user_id", userId);
+    const { error } = await this.supabase
+      .from(DB_TABLES.FLASHCARD)
+      .delete()
+      .eq("id", flashcardId)
+      .eq("user_id", userId);
 
     if (error) {
       if (error.code === "PGRST116") {
         throw new Error(ERROR_MESSAGES.FLASHCARD_NOT_FOUND);
+      }
+      throw new Error(ERROR_MESSAGES.DELETE_FLASHCARD_FAILED);
+    }
+  }
+
+  async deleteFlashcardsByGroupId(groupId: string): Promise<void> {
+    const userId = await this.supabase.getUserIdFromSession();
+
+    const { error } = await this.supabase
+      .from(DB_TABLES.FLASHCARD)
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+
+    if (error) {
+      if (error.code === "23503") {
+        throw new Error(ERROR_MESSAGES.GROUP_NOT_FOUND);
       }
       throw new Error(ERROR_MESSAGES.DELETE_FLASHCARD_FAILED);
     }

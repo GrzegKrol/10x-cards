@@ -197,4 +197,44 @@ describe("FlashcardService", () => {
       expect(result).toEqual(mockFlashcard);
     });
   });
+
+  describe("deleteFlashcardsByGroupId", () => {
+    it("should delete all flashcards in a group successfully", async () => {
+      const mockUserId = "test-user-id";
+
+      vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
+
+      const eq2Mock = vi.fn().mockResolvedValue({ error: null });
+      const eqMock = vi.fn().mockReturnValue({ eq: eq2Mock });
+
+      vi.spyOn(mockSupabase, "from").mockReturnValue({
+        delete: vi.fn().mockReturnValue({
+          eq: eqMock,
+        }),
+      });
+
+      await expect(service.deleteFlashcardsByGroupId("group-1")).resolves.not.toThrow();
+    });
+
+    it("should throw error when group not found", async () => {
+      const mockUserId = "test-user-id";
+
+      vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
+
+      const eq2Mock = vi.fn().mockResolvedValue({
+        error: { code: "23503" },
+      });
+      const eqMock = vi.fn().mockReturnValue({ eq: eq2Mock });
+
+      vi.spyOn(mockSupabase, "from").mockReturnValue({
+        delete: vi.fn().mockReturnValue({
+          eq: eqMock,
+        }),
+      });
+
+      await expect(service.deleteFlashcardsByGroupId("non-existent-group")).rejects.toThrow(
+        ERROR_MESSAGES.GROUP_NOT_FOUND
+      );
+    });
+  });
 });

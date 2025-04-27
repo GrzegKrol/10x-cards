@@ -14,7 +14,7 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
     }
 
     const flashcardService = new FlashcardService(locals.supabase);
-    await flashcardService.deleteGroupFlashcards(groupId);
+    await flashcardService.deleteFlashcardsByGroupId(groupId);
 
     return new Response(null, { status: 204 });
   } catch (error: unknown) {
