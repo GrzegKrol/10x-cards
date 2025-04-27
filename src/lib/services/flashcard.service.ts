@@ -2,13 +2,12 @@ import type { SupabaseClient } from "@/db/supabase.client";
 import type { FlashcardDTO, FlashcardsListDTO, CreateFlashcardCommand, UpdateFlashcardCommand } from "@/types";
 import type { FlashcardsListQuery } from "@/lib/schemas/flashcards.schema";
 import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
-import { getUserIdFromSession } from "@/lib/utils";
 
 export class FlashcardService {
   constructor(private readonly supabase: SupabaseClient) {}
 
   async getFlashcards(query: FlashcardsListQuery): Promise<FlashcardsListDTO> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     // Calculate pagination
     const from = (query.page - 1) * query.limit;
@@ -44,7 +43,7 @@ export class FlashcardService {
   }
 
   async getFlashcard(flashcardId: string): Promise<FlashcardDTO> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD)
@@ -61,7 +60,7 @@ export class FlashcardService {
   }
 
   async createFlashcard(data: CreateFlashcardCommand): Promise<FlashcardDTO> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD)
@@ -93,7 +92,7 @@ export class FlashcardService {
   }
 
   async updateFlashcard(flashcardId: string, data: UpdateFlashcardCommand): Promise<FlashcardDTO> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     const result = await this.supabase
       .from(DB_TABLES.FLASHCARD)
@@ -116,7 +115,7 @@ export class FlashcardService {
   }
 
   async deleteFlashcard(flashcardId: string): Promise<void> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     const { error } = await this.supabase
       .from(DB_TABLES.FLASHCARD)
@@ -133,7 +132,7 @@ export class FlashcardService {
   }
 
   async deleteGroupFlashcards(groupId: string): Promise<void> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     const { error } = await this.supabase
       .from(DB_TABLES.FLASHCARD)

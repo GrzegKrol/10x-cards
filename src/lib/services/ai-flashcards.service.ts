@@ -2,7 +2,6 @@ import type { SupabaseClient } from "@/db/supabase.client";
 import type { AICreateFlashcardCommand, FlashcardDTO } from "@/types";
 import { OpenRouterService } from "./openrouter.service";
 import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
-import { getUserIdFromSession } from "@/lib/utils";
 
 export class AIFlashcardsService {
   constructor(
@@ -11,7 +10,7 @@ export class AIFlashcardsService {
   ) {}
 
   async generateFlashcards(command: Omit<AICreateFlashcardCommand, "user_id">): Promise<FlashcardDTO[]> {
-    const userId = await getUserIdFromSession(this.supabase);
+    const userId = await this.supabase.getUserIdFromSession();
 
     // Verify group exists and user has access
     const { data: group, error: groupError } = await this.supabase

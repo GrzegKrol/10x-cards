@@ -1,8 +1,9 @@
 import type { AstroCookies } from "astro";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient as BaseSupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 import type { Database } from "./database.types";
+import { ERROR_MESSAGES } from "@/lib/constants";
 
 const supabaseUrl = import.meta.env.SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
@@ -21,8 +22,15 @@ function parseCookieHeader(cookieHeader: string): { name: string; value: string 
   });
 }
 
-export const createSupabaseServerInstance = (context: { headers: Headers; cookies: AstroCookies }) => {
-  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+export type ExtendedSupabaseClient = BaseSupabaseClient<Database> & {
+  getUserIdFromSession(): Promise<string>;
+};
+
+export const createSupabaseServerInstance = (context: {
+  headers: Headers;
+  cookies: AstroCookies;
+}): ExtendedSupabaseClient => {
+  const baseClient = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookieOptions,
     cookies: {
       getAll() {
@@ -34,12 +42,33 @@ export const createSupabaseServerInstance = (context: { headers: Headers; cookie
     },
   });
 
-  return supabase;
+  const getUserIdFromSession = async () => {
+    const {
+      data: { session },
+      error,
+    } = await baseClient.auth.getSession();
+    if (error || !session?.user) {
+      throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+    }
+    return session.user.id;
+  };
+
+  return Object.assign(baseClient, { getUserIdFromSession });
 };
 
-// Client-side Supabase instance
-export const supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+const baseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-export type SupabaseClient = typeof supabaseClient;
+export const supabaseClient: ExtendedSupabaseClient = Object.assign(baseClient, {
+  async getUserIdFromSession() {
+    const {
+      data: { session },
+      error,
+    } = await baseClient.auth.getSession();
+    if (error || !session?.user) {
+      throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
+    }
+    return session.user.id;
+  },
+});
 
-export const DEFAULT_USER_ID = "b975a481-59da-46a6-8ee9-ceb37621cd54";
+export type SupabaseClient = ExtendedSupabaseClient;

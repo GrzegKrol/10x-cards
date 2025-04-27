@@ -1,5 +1,4 @@
 import { ERROR_MESSAGES } from "./constants";
-import type { SupabaseClient } from "@/db/supabase.client";
 import type { ZodError } from "zod";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -39,15 +38,4 @@ export function createErrorResponse(error: string, details?: string, status = 50
       },
     }
   );
-}
-
-export async function getUserIdFromSession(supabase: SupabaseClient): Promise<string> {
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
-  if (error || !session?.user) {
-    throw new Error(ERROR_MESSAGES.UNAUTHORIZED_ACCESS);
-  }
-  return session.user.id;
 }
