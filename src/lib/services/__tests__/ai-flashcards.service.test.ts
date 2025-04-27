@@ -2,15 +2,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { AIFlashcardsService } from "../ai-flashcards.service";
 import { OpenRouterService } from "../openrouter.service";
 import { ERROR_MESSAGES } from "@/lib/constants";
-
 import type { SupabaseClient } from "@/db/supabase.client";
-
-vi.mock("@/db/database.types", () => ({
-  DB_TABLES: {
-    FLASHCARD_GROUP: "flashcard_group",
-    FLASHCARD: "flashcard",
-  },
-}));
+import type { FlashcardAI } from "@/types";
 
 describe("AIFlashcardsService", () => {
   let service: AIFlashcardsService;
@@ -31,152 +24,137 @@ describe("AIFlashcardsService", () => {
   });
 
   describe("generateFlashcards", () => {
-    it("should generate and save AI flashcards successfully", async () => {
-      const mockUserId = "test-user-id";
-      const mockGroupId = "group-1";
-      const mockGeneratedCards = [
-        { front: "AI Question 1", back: "AI Answer 1" },
-        { front: "AI Question 2", back: "AI Answer 2" },
-      ];
-      const mockSavedCards = mockGeneratedCards.map((card, index) => ({
-        ...card,
-        id: `card-${index + 1}`,
-        group_id: mockGroupId,
-        user_id: mockUserId,
-        source: "ai",
-        is_approved: false,
-        creation_date: expect.any(String),
-        updated_date: expect.any(String),
+    const mockUserId = "test-user-id";
+    const mockCommand = {
+      group_id: "test-group-id",
+      prompt: "Test prompt",
+      cards_count: 3,
+    };
+
+    const mockGeneratedFlashcards: FlashcardAI[] = [
+      { front: "Question 1", back: "Answer 1" },
+      { front: "Question 2", back: "Answer 2" },
+      { front: "Question 3", back: "Answer 3" },
+    ];
+
+    const mockSavedFlashcards: FlashcardAI[] = mockGeneratedFlashcards.map((card, index) => ({
+      ...card,
+      id: `card-${index + 1}`,
+      group_id: mockCommand.group_id,
+      user_id: mockUserId,
+      source: "ai" as const,
+      is_approved: false,
+      creation_date: expect.any(String),
+      updated_date: expect.any(String),
+    }));
+
+    it("should generate and save flashcards successfully", async () => {
+      vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
+
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: { id: mockCommand.group_id },
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      const insertMock = vi.fn().mockReturnValue({
+        select: vi.fn().mockResolvedValue({
+          data: mockSavedFlashcards,
+          error: null,
+        }),
+      });
+
+      vi.spyOn(mockSupabase, "from").mockImplementation(() => ({
+        select: selectMock,
+        insert: insertMock,
       }));
 
-      vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
+      vi.spyOn(mockOpenRouter, "generateFlashcards").mockResolvedValue(mockGeneratedFlashcards);
 
-      const singleForGroupMock = vi.fn().mockResolvedValue({
-        data: { id: mockGroupId },
-        error: null,
-      });
-      const eq2ForGroupMock = vi.fn().mockReturnValue({ single: singleForGroupMock });
-      const eqForGroupMock = vi.fn().mockReturnValue({ eq: eq2ForGroupMock });
-      const selectForGroupMock = vi.fn().mockReturnValue({ eq: eqForGroupMock });
+      const result = await service.generateFlashcards(mockCommand);
 
-      const selectForFlashcardMock = vi.fn().mockResolvedValue({
-        data: mockSavedCards,
-        error: null,
-      });
-      const insertForFlashcardMock = vi.fn().mockReturnValue({ select: selectForFlashcardMock });
-
-      vi.spyOn(mockSupabase, "from").mockImplementation((table: string) => {
-        if (table === "flashcard_group") {
-          return { select: selectForGroupMock };
-        }
-        return { insert: insertForFlashcardMock };
-      });
-
-      vi.spyOn(mockOpenRouter, "generateFlashcards").mockResolvedValue(mockGeneratedCards);
-
-      const result = await service.generateFlashcards({
-        prompt: "Generate test flashcards",
-        cards_count: 2,
-        group_id: mockGroupId,
-      });
-
-      expect(result).toEqual(mockSavedCards);
+      expect(result).toEqual(mockSavedFlashcards);
+      expect(mockOpenRouter.generateFlashcards).toHaveBeenCalledWith(mockCommand.prompt, mockCommand.cards_count);
     });
 
-    it("should throw error when group not found", async () => {
-      const mockUserId = "test-user-id";
-
+    it("should throw error when group is not found", async () => {
       vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
 
-      const singleMock = vi.fn().mockResolvedValue({
-        data: null,
-        error: new Error(ERROR_MESSAGES.GROUP_NOT_FOUND),
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: null,
+              error: { message: "Group not found" },
+            }),
+          }),
+        }),
       });
-
-      const eq2Mock = vi.fn().mockReturnValue({ single: singleMock });
-      const eqMock = vi.fn().mockReturnValue({ eq: eq2Mock });
-      const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
 
       vi.spyOn(mockSupabase, "from").mockReturnValue({
         select: selectMock,
-      });
+      } as unknown as ReturnType<SupabaseClient["from"]>);
 
-      await expect(
-        service.generateFlashcards({
-          prompt: "Generate test flashcards",
-          cards_count: 2,
-          group_id: "non-existent-group",
-        })
-      ).rejects.toThrow(ERROR_MESSAGES.GROUP_NOT_FOUND);
+      await expect(service.generateFlashcards(mockCommand)).rejects.toThrow(ERROR_MESSAGES.GROUP_NOT_FOUND);
     });
 
-    it("should throw error when AI generation fails", async () => {
-      const mockUserId = "test-user-id";
-      const mockGroupId = "group-1";
-
+    it("should throw error when OpenRouter service fails", async () => {
       vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
 
-      const singleMock = vi.fn().mockResolvedValue({
-        data: { id: mockGroupId },
-        error: null,
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: { id: mockCommand.group_id },
+              error: null,
+            }),
+          }),
+        }),
       });
-
-      const eq2Mock = vi.fn().mockReturnValue({ single: singleMock });
-      const eqMock = vi.fn().mockReturnValue({ eq: eq2Mock });
-      const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
 
       vi.spyOn(mockSupabase, "from").mockReturnValue({
         select: selectMock,
-      });
+      } as unknown as ReturnType<SupabaseClient["from"]>);
 
       vi.spyOn(mockOpenRouter, "generateFlashcards").mockRejectedValue(new Error(ERROR_MESSAGES.OPENROUTER_ERROR));
 
-      await expect(
-        service.generateFlashcards({
-          prompt: "Generate test flashcards",
-          cards_count: 2,
-          group_id: mockGroupId,
-        })
-      ).rejects.toThrow(ERROR_MESSAGES.OPENROUTER_ERROR);
+      await expect(service.generateFlashcards(mockCommand)).rejects.toThrow(ERROR_MESSAGES.OPENROUTER_ERROR);
     });
 
-    it("should handle errors when saving generated flashcards", async () => {
-      const mockUserId = "test-user-id";
-      const mockGroupId = "group-1";
-      const mockGeneratedCards = [{ front: "AI Question 1", back: "AI Answer 1" }];
-
+    it("should throw error when saving flashcards fails", async () => {
       vi.spyOn(mockSupabase, "getUserIdFromSession").mockResolvedValue(mockUserId);
 
-      const singleForGroupMock = vi.fn().mockResolvedValue({
-        data: { id: mockGroupId },
-        error: null,
-      });
-      const eq2ForGroupMock = vi.fn().mockReturnValue({ single: singleForGroupMock });
-      const eqForGroupMock = vi.fn().mockReturnValue({ eq: eq2ForGroupMock });
-      const selectForGroupMock = vi.fn().mockReturnValue({ eq: eqForGroupMock });
-
-      const selectForFlashcardMock = vi.fn().mockResolvedValue({
-        data: null,
-        error: new Error("Database error"),
-      });
-      const insertForFlashcardMock = vi.fn().mockReturnValue({ select: selectForFlashcardMock });
-
-      vi.spyOn(mockSupabase, "from").mockImplementation((table: string) => {
-        if (table === "flashcard_group") {
-          return { select: selectForGroupMock };
-        }
-        return { insert: insertForFlashcardMock };
+      const selectMock = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({
+              data: { id: mockCommand.group_id },
+              error: null,
+            }),
+          }),
+        }),
       });
 
-      vi.spyOn(mockOpenRouter, "generateFlashcards").mockResolvedValue(mockGeneratedCards);
+      const insertMock = vi.fn().mockReturnValue({
+        select: vi.fn().mockResolvedValue({
+          data: null,
+          error: new Error("Database error"),
+        }),
+      });
 
-      await expect(
-        service.generateFlashcards({
-          prompt: "Generate test flashcards",
-          cards_count: 1,
-          group_id: mockGroupId,
-        })
-      ).rejects.toThrow(ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED);
+      vi.spyOn(mockSupabase, "from").mockImplementation(() => ({
+        select: selectMock,
+        insert: insertMock,
+      }));
+
+      vi.spyOn(mockOpenRouter, "generateFlashcards").mockResolvedValue(mockGeneratedFlashcards);
+
+      await expect(service.generateFlashcards(mockCommand)).rejects.toThrow(ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED);
     });
   });
 });
