@@ -17,6 +17,26 @@
 - Provides access to a wide range of models (OpenAI, Anthropic, Google, and many others) to find effective, cost-efficient solutions.
 - Allows setting financial limits on API keys.
 
+## Testing Technologies
+- **Unit and Integration Testing:**
+  - Vitest for fast, TypeScript-friendly unit testing
+  - React Testing Library for component testing
+  - MSW (Mock Service Worker) for API mocking
+  - Storybook for component documentation and testing
+
+- **E2E Testing:**
+  - Playwright for reliable cross-browser testing
+  - Axe for accessibility testing
+
+- **Performance Testing:**
+  - Artillery for Node.js-based load testing
+  - Lighthouse CI for frontend performance measurements
+
+- **Security Testing:**
+  - OWASP ZAP for security scanning
+  - Snyk for dependency scanning
+  - SonarQube for static code analysis
+
 ## CI/CD and Hosting
 - Github Actions for creating CI/CD pipelines.
 - DigitalOcean for hosting applications using Docker images.

@@ -16,6 +16,11 @@
 - **Frontend:** Astro 5, React 19, TypeScript 5, Tailwind 4, Shadcn/ui
 - **Backend:** Supabase for database and authentication services
 - **AI:** Integration with Openrouter.ai for accessing multiple models
+- **Testing:** 
+  - Vitest and React Testing Library for unit/integration tests
+  - Playwright for E2E testing
+  - Artillery and Lighthouse CI for performance testing
+  - OWASP ZAP and Snyk for security testing
 
 ## Getting Started Locally
 1. Ensure you have Node.js version defined in [`.nvmrc`](./.nvmrc) (22.14.0).
@@ -38,6 +43,10 @@
 - `npm run lint` – Lint the project files.
 - `npm run lint:fix` – Automatically fix lint issues.
 - `npm run format` – Format the codebase using Prettier.
+- `npm run test` – Run unit and integration tests with Vitest.
+- `npm run test:e2e` – Run E2E tests with Playwright.
+- `npm run test:coverage` – Generate test coverage report.
+- `npm run storybook` – Start Storybook for component development.
 
 ## Project Scope
 - **Flashcard Creation:** Supports both AI-generated and manual flashcards.
