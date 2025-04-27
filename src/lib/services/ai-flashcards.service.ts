@@ -1,7 +1,7 @@
-import type { SupabaseClient } from "@/db/supabase.client";
-import type { AICreateFlashcardCommand, FlashcardDTO } from "@/types";
+import type { FlashcardAI, AICreateFlashcardCommand } from "@/types";
+import { ERROR_MESSAGES, DB_TABLES } from "@/lib/constants";
 import { OpenRouterService } from "./openrouter.service";
-import { DB_TABLES, ERROR_MESSAGES } from "@/lib/constants";
+import type { SupabaseClient } from "@/db/supabase.client";
 
 export class AIFlashcardsService {
   constructor(
@@ -9,10 +9,10 @@ export class AIFlashcardsService {
     private readonly openRouter: OpenRouterService
   ) {}
 
-  async generateFlashcards(command: Omit<AICreateFlashcardCommand, "user_id">): Promise<FlashcardDTO[]> {
+  async generateFlashcards(command: AICreateFlashcardCommand): Promise<FlashcardAI[]> {
     const userId = await this.supabase.getUserIdFromSession();
 
-    // Verify group exists and user has access
+    // Check if group exists and belongs to user
     const { data: group, error: groupError } = await this.supabase
       .from(DB_TABLES.FLASHCARD_GROUP)
       .select("id")
@@ -24,53 +24,36 @@ export class AIFlashcardsService {
       throw new Error(ERROR_MESSAGES.GROUP_NOT_FOUND);
     }
 
-    // Generate flashcards using AI
-    const generatedCards = await this.openRouter.generateFlashcards(command.prompt, command.cards_count);
+    try {
+      // Generate flashcards using OpenRouter
+      const generatedFlashcards = await this.openRouter.generateFlashcards(command.prompt, command.cards_count);
 
-    // Save generated flashcards to database
-    const now = new Date().toISOString();
-    const { data: flashcards, error: insertError } = await this.supabase
-      .from(DB_TABLES.FLASHCARD)
-      .insert(
-        generatedCards.map((card) => ({
-          front: card.front,
-          back: card.back,
-          group_id: command.group_id,
-          user_id: userId,
-          source: "ai" as const,
-          is_approved: false,
-          creation_date: now,
-          updated_date: now,
-        }))
-      )
-      .select();
+      // Save generated flashcards
+      const flashcardDTOs = generatedFlashcards.map((card) => ({
+        ...card,
+        group_id: command.group_id,
+        user_id: userId,
+        source: "ai" as const,
+        is_approved: false,
+        creation_date: new Date().toISOString(),
+        updated_date: new Date().toISOString(),
+      }));
 
-    if (insertError) {
-      throw new Error(`${ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED}: ${insertError.message}`);
+      const { data: savedFlashcards, error: saveError } = await this.supabase
+        .from(DB_TABLES.FLASHCARD)
+        .insert(flashcardDTOs)
+        .select("*");
+
+      if (saveError || !savedFlashcards) {
+        throw new Error(ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED);
+      }
+
+      return savedFlashcards;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error(ERROR_MESSAGES.OPENROUTER_ERROR);
     }
-
-    if (!flashcards) {
-      throw new Error(ERROR_MESSAGES.SAVE_FLASHCARDS_FAILED);
-    }
-
-    // Update group metadata
-    const { error: updateError } = await this.supabase
-      .from(DB_TABLES.FLASHCARD_GROUP)
-      .update({
-        last_used_prompt: command.prompt,
-        last_used_cards_count: command.cards_count,
-        updated_date: now,
-      })
-      .eq("id", command.group_id)
-      .eq("user_id", userId);
-
-    if (updateError) {
-      // Log error but don't fail the request as this is not critical
-      // TODO: Implement proper error logging
-      // eslint-disable-next-line no-console
-      console.error("Failed to update group metadata:", updateError);
-    }
-
-    return flashcards;
   }
 }

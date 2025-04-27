@@ -1,9 +1,9 @@
-import type { FlashcardAI as FlashcardProposals } from "@/types";
+import type { FlashcardAI } from "@/types";
 import { ERROR_MESSAGES } from "@/lib/constants";
 
 export class OpenRouterService {
   private readonly baseUrl = "https://openrouter.ai/api/v1";
-  private readonly maxResponseTime = 60000; // 30 seconds
+  private readonly maxResponseTime = 60000; // 60 seconds
 
   constructor(private apiKey: string) {
     if (!apiKey) {
@@ -11,7 +11,7 @@ export class OpenRouterService {
     }
   }
 
-  async generateFlashcards(prompt: string, count: number): Promise<FlashcardProposals[]> {
+  async generateFlashcards(prompt: string, count: number): Promise<FlashcardAI[]> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.maxResponseTime);
@@ -68,30 +68,23 @@ export class OpenRouterService {
       }
 
       const rawJson = await response.json();
-      console.debug("Raw API response:", rawJson);
-      console.debug("Structured API message:", rawJson.choices[0].message);
 
-      const flashcards = JSON.parse(rawJson.choices[0].message.content).flashcards as FlashcardProposals[];
-      console.debug("Extracted flashcards:", flashcards);
-
-      return flashcards;
+      try {
+        const flashcards = JSON.parse(rawJson.choices[0].message.content).flashcards;
+        if (!Array.isArray(flashcards)) {
+          throw new Error(ERROR_MESSAGES.OPENROUTER_ERROR);
+        }
+        return flashcards;
+      } catch {
+        throw new Error(ERROR_MESSAGES.OPENROUTER_ERROR);
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.name === "AbortError") {
-          console.error(ERROR_MESSAGES.OPENROUTER_ERROR, {
-            maxResponseTime: this.maxResponseTime,
-            error: error.message,
-          });
           throw new Error("OpenRouter API request timed out");
         }
-        console.error(ERROR_MESSAGES.OPENROUTER_ERROR, {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-        });
         throw new Error(`${ERROR_MESSAGES.OPENROUTER_ERROR}: ${error.message}`);
       }
-      console.error("Unknown OpenRouter Error:", error);
       throw new Error(ERROR_MESSAGES.OPENROUTER_ERROR);
     }
   }

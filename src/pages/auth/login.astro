@@ -16,13 +16,10 @@ const {
 } = await supabase.auth.getUser();
 
 if (user) {
-  return Astro.redirect('/groups');
+  return Astro.redirect("/groups");
 }
 ---
 
-<AuthLayout
-  title="Sign In - 10x Cards"
-  description="Sign in to your 10x Cards account to access your flashcards"
->
+<AuthLayout title="Sign In - 10x Cards" description="Sign in to your 10x Cards account to access your flashcards">
   <LoginForm client:load />
 </AuthLayout>

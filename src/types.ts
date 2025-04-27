@@ -16,6 +16,17 @@ export interface PaginationDTO {
   total: number;
 }
 
+// DTO interfaces for list query parameters
+export interface FlashcardsListQuery {
+  page?: number;
+  limit?: number;
+  group_id?: string;
+  sort?: string;
+  order?: "asc" | "desc";
+  source?: "manual" | "ai";
+  is_approved?: boolean;
+}
+
 // Base DB Row types
 type FlashcardGroupRow = Database["public"]["Tables"]["flashcards_group"]["Row"];
 type FlashcardRow = Database["public"]["Tables"]["flashcard"]["Row"];

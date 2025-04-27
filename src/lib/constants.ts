@@ -9,6 +9,9 @@ export const ERROR_MESSAGES = {
   DELETE_FLASHCARD_FAILED: "Failed to delete flashcard",
   DELETE_ALL_FLASHCARDS_FAILED: "Failed to delete all flashcards from group",
   UNAUTHORIZED_ACCESS: "You don't have permission to perform this action",
+  FETCH_FLASHCARDS_FAILED: "Failed to fetch flashcards",
+  CREATE_FLASHCARD_FAILED: "Failed to create flashcard",
+  UPDATE_FLASHCARD_FAILED: "Failed to update flashcard",
 } as const;
 
 export const HTTP_HEADERS = {

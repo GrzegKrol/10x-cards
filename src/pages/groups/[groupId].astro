@@ -8,10 +8,7 @@ if (!groupId) {
   return Astro.redirect("/groups");
 }
 
-const breadcrumbs = [
-  { label: "Groups", href: "/groups" },
-  { label: "Group Details" }
-];
+const breadcrumbs = [{ label: "Groups", href: "/groups" }, { label: "Group Details" }];
 ---
 
 <Layout title="Group Details" breadcrumbs={breadcrumbs}>
