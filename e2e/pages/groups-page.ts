@@ -16,9 +16,11 @@ export class GroupsPage extends BasePage {
   }
 
   async waitForLoading(): Promise<void> {
-    const loading = this.getByTestId("groups-loading");
-    await expect(loading).toBeVisible();
-    await expect(loading).not.toBeVisible();
+    // First ensure we're on the groups page
+    await this.waitForTestId("groups-container");
+
+    const button = this.getByTestId("add-group-button");
+    await expect(button).toBeVisible({ timeout: 5000 });
   }
 
   async clickAddGroupButton(): Promise<AddGroupDialog> {
@@ -60,5 +62,10 @@ export class GroupsPage extends BasePage {
       await retryButton.click();
       await this.waitForLoading();
     }
+  }
+
+  async verifyUserEmail(expectedEmail: string): Promise<void> {
+    const emailElement = await this.getUserEmail();
+    await expect(emailElement).toHaveText(expectedEmail);
   }
 }

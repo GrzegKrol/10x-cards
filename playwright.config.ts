@@ -18,12 +18,25 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "setup db",
+      testMatch: /global\.setup\.ts/,
+      teardown: "cleanup db",
+    },
+    {
+      name: "cleanup db",
+      testMatch: /global\.teardown\.ts/,
+    },
+    {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "./e2e/.auth/user.json",
+      },
+      dependencies: ["setup db"],
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: "npm run dev:e2e",
     url: "http://localhost:3000",
     reuseExistingServer: true,
     stdout: "pipe",

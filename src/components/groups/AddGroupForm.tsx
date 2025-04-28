@@ -124,7 +124,7 @@ export default function AddGroupForm({ onSubmit }: AddGroupFormProps) {
               disabled={isSubmitting}
               className="w-full sm:w-auto"
               aria-busy={isSubmitting}
-              data-testId="submit-group-button"
+              data-testId="create-group-button"
             >
               {isSubmitting ? "Creating..." : "Create Group"}
             </Button>
