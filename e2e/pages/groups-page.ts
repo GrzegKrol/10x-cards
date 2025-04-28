@@ -68,4 +68,19 @@ export class GroupsPage extends BasePage {
     const emailElement = await this.getUserEmail();
     await expect(emailElement).toHaveText(expectedEmail);
   }
+
+  async waitForGroupDetails(): Promise<void> {
+    await this.waitForTestId("group-details-container");
+  }
+
+  async getGroupNameText(): Promise<string | null> {
+    const element = this.getByTestId("group-name");
+    return element.textContent();
+  }
+
+  async areGroupDetailsActionsVisible(): Promise<boolean> {
+    const generateButton = await this.getByTestId("generate-ai-flashcards").isVisible();
+    const addButton = await this.getByTestId("add-flashcard").isVisible();
+    return generateButton && addButton;
+  }
 }

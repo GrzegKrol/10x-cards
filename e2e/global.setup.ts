@@ -13,4 +13,5 @@ setup("authenticate", async ({ page }) => {
 
   // Store authentication state
   await page.context().storageState({ path: "./e2e/.auth/user.json" });
+  console.log("User authenticated: ", env.email);
 });

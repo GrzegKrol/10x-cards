@@ -16,7 +16,6 @@ async function createSupabaseClient(env: EnvProperties): Promise<SupabaseClient>
     throw new Error(`Failed to authenticate: ${authError.message}`);
   }
 
-  console.log("Successfully authenticated with Supabase");
   return supabase;
 }
 
