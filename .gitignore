@@ -17,6 +17,7 @@ pnpm-debug.log*
 test-results/
 playwright-report/
 coverage/
+e2e/.auth/
 
 # environment variables
 .env
