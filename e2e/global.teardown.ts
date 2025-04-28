@@ -1,33 +1,8 @@
 import { test as teardown } from "@playwright/test";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { getValidatedEnvProperties, type EnvProperties } from "./types";
 
-interface EnvVariables {
-  supabaseUrl: string;
-  supabaseKey: string;
-  userId: string;
-  email: string;
-  password: string;
-}
-
-function validateEnv(): EnvVariables {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_KEY;
-  const userId = process.env.E2E_USERNAME_ID;
-  const email = process.env.E2E_USERNAME;
-  const password = process.env.E2E_PASSWORD;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("SUPABASE_URL and SUPABASE_KEY environment variables must be set");
-  }
-
-  if (!userId || !email || !password) {
-    throw new Error("E2E_USERNAME_ID, E2E_USERNAME, and E2E_PASSWORD environment variables must be set");
-  }
-
-  return { supabaseUrl, supabaseKey, userId, email, password };
-}
-
-async function createSupabaseClient(env: EnvVariables): Promise<SupabaseClient> {
+async function createSupabaseClient(env: EnvProperties): Promise<SupabaseClient> {
   const supabase = createClient(env.supabaseUrl, env.supabaseKey);
 
   console.log("Authenticating with Supabase...");
@@ -46,7 +21,7 @@ async function createSupabaseClient(env: EnvVariables): Promise<SupabaseClient> 
 }
 
 teardown("delete test data", async () => {
-  const env = validateEnv();
+  const env = getValidatedEnvProperties();
   const supabase = await createSupabaseClient(env);
 
   console.log(`Cleaning up data for user: ${env.userId}`);

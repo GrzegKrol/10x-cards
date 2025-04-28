@@ -1,19 +1,14 @@
 import { test as setup, expect } from "@playwright/test";
 import { LoginPage } from "./pages/auth/login-page";
-
-const username = process.env.E2E_USERNAME ?? "";
-const password = process.env.E2E_PASSWORD ?? "";
+import { getValidatedEnvProperties } from "./types";
 
 setup("authenticate", async ({ page }) => {
-  // Validate environment variables
-  if (!username || !password) {
-    throw new Error("Required environment variables are not set");
-  }
+  const env = getValidatedEnvProperties();
 
   // Perform login
   const loginPage = LoginPage.create(page);
   await loginPage.navigate();
-  await loginPage.login(username, password);
+  await loginPage.login(env.email, env.password);
   await expect(page).toHaveURL("/groups");
 
   // Store authentication state
