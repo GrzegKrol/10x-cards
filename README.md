@@ -58,6 +58,3 @@
 
 ## Project Status
 Currently in active development with an MVP that addresses core functionalities as outlined in the product requirements.
-
-## License
-This project is licensed under the MIT License.
