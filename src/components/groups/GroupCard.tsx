@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import type { FlashcardGroupDTO } from "@/types";
 
 interface GroupCardProps {

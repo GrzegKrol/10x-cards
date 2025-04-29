@@ -1,6 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
-import { fileURLToPath } from "url";
+import { fileURLToPath, URL } from "url";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
