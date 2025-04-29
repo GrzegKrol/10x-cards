@@ -54,7 +54,7 @@ jobs:
     needs: lint
     name: E2E Tests
     runs-on: ubuntu-latest
-    environment: integration
+    environment: e2e
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
