@@ -22,7 +22,7 @@ e2e/.auth/
 # environment variables
 .env
 .env.development
-.env.test
+.env.e2e
 .env.production
 
 # macOS-specific files
